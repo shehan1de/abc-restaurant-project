@@ -1,0 +1,13 @@
+# Node modules
+node_modules/
+
+# Build output
+build/
+dist/
+
+# IDE files
+.idea/
+.vscode/
+
+# Java files
+*.class
