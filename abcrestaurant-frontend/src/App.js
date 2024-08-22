@@ -31,14 +31,14 @@ function App() {
         <Route path="/contact" element={<Contact />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
-        <Route path="/admin-dashboard" element={<ProtectedRoute element={AdminDashboard} allowedRoles={['Admin']} />} />
-        <Route path="/staff-dashboard" element={<ProtectedRoute element={StaffDashboard} allowedRoles={['Staff']} />} />
-        <Route path="/customer-dashboard" element={<ProtectedRoute element={CustomerDashboard} allowedRoles={['Customer']} />} />
-        <Route path="/products/:categoryName" element={<ProtectedRoute element={ProductView} allowedRoles={['Customer', 'Admin', 'Staff']} />} />
         <Route path="*" element={<Index />} />
         <Route path="/forget-password-1" element={<ForgetPw1 />} />
         <Route path="/forget-password-2" element={<ForgetPw2 />} />
         <Route path="/reset-pw" element={<ResetPw />} />
+        <Route path="/admin-dashboard" element={<ProtectedRoute element={AdminDashboard} allowedRoles={['Admin']} />} />
+        <Route path="/staff-dashboard" element={<ProtectedRoute element={StaffDashboard} allowedRoles={['Staff']} />} />
+        <Route path="/customer-dashboard" element={<ProtectedRoute element={CustomerDashboard} allowedRoles={['Customer']} />} />
+        <Route path="/products/:categoryName" element={<ProtectedRoute element={ProductView} allowedRoles={['Customer', 'Admin', 'Staff']} />} />
         <Route path="/favorites" element={<ProtectedRoute element={Favorites} allowedRoles={['Customer']} />} />
       </Routes>
     </Router>

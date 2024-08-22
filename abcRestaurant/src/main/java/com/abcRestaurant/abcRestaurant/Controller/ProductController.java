@@ -1,6 +1,7 @@
 package com.abcRestaurant.abcRestaurant.Controller;
 
 import com.abcRestaurant.abcRestaurant.Model.Product;
+import com.abcRestaurant.abcRestaurant.Service.FavoriteProductService;
 import com.abcRestaurant.abcRestaurant.Service.ProductService;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/product")
@@ -17,6 +19,9 @@ public class ProductController {
 
     @Autowired
     private ProductService productService;
+
+    @Autowired
+    private FavoriteProductService favoriteProductService;
 
     @GetMapping
     public ResponseEntity<List<Product>> getProductsByCategory(
@@ -54,19 +59,16 @@ public class ProductController {
         productService.deleteProduct(id);
         return ResponseEntity.noContent().build();
     }
-
-    // Mark or unmark a product as favorite
-    @PutMapping("/{id}/favorite")
-    public ResponseEntity<Product> toggleFavorite(@PathVariable("id") ObjectId id) {
-        Optional<Product> productOpt = productService.singleProduct(id);
-        if (productOpt.isPresent()) {
-            Product product = productOpt.get();
-
-            Product updatedProduct = productService.updateProduct(id, product);
-            return ResponseEntity.ok(updatedProduct);
-        }
-        return ResponseEntity.notFound().build();
+    @GetMapping("/byProductId/{productId}")
+    public ResponseEntity<Product> getProductByProductId(@PathVariable("productId") String productId) {
+        Optional<Product> product = productService.findProductByProductId(productId);
+        return product.map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.notFound().build());
     }
+
+
+
+
 
 
 }

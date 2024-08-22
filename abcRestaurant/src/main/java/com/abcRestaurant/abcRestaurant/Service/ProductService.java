@@ -9,9 +9,11 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class ProductService {
+
     @Autowired
     private ProductRepository productRepository;
 
@@ -27,14 +29,8 @@ public class ProductService {
 
     // Add a new product
     public Product addProduct(Product product) {
-        product.setProductId(generateProductId());
+        product.setId(new ObjectId());  // Ensure ID is set before saving
         return productRepository.save(product);
-    }
-
-    // Generate a new product ID
-    private String generateProductId() {
-        long count = productRepository.count();
-        return String.format("product-%03d", count + 1);
     }
 
     // Update an existing product by id
@@ -42,7 +38,6 @@ public class ProductService {
         if (!productRepository.existsById(id)) {
             throw new ResourceNotFoundException("Product not found with id " + id);
         }
-        // Ensure the ID in the request body matches the ID in the URL
         product.setId(id);
         return productRepository.save(product);
     }
@@ -60,5 +55,20 @@ public class ProductService {
         return productRepository.findByCategoryName(categoryName);
     }
 
+    // Get products by list of IDs
+    public List<Product> findProductsByIds(List<String> ids) {
+        // Convert the list of string IDs to ObjectId
+        List<ObjectId> objectIds = ids.stream()
+                .map(ObjectId::new)
+                .collect(Collectors.toList());
+
+        return productRepository.findAllById(objectIds);
+    }
+
+    // Get a single product by product id
+
+    public Optional<Product> findProductByProductId(String productId) {
+        return productRepository.findByProductId(productId);
+    }
 
 }

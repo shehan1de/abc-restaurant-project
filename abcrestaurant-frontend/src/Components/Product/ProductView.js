@@ -2,7 +2,6 @@ import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import '../../CSS/Card.css';
-import { addFavoriteProduct, removeFavoriteProduct } from '../../Services/apiService';
 import Navigation2 from '../navigation2';
 
 const ProductView = () => {
@@ -12,8 +11,8 @@ const ProductView = () => {
     const [cart, setCart] = useState({});
     const [favorites, setFavorites] = useState(new Set());
     const navigate = useNavigate();
-    const user = JSON.parse(localStorage.getItem('user')); // Retrieve user object from localStorage
-    const userId = user ? user.userId : null; // Extract userId from user object
+    const user = JSON.parse(localStorage.getItem('user'));
+    const userId = user ? user.userId : null;
 
     useEffect(() => {
         const fetchProducts = async () => {
@@ -21,15 +20,25 @@ const ProductView = () => {
                 const response = await axios.get(`/product?categoryName=${encodeURIComponent(categoryName)}`);
                 setProducts(response.data);
 
-                const storedFavorites = JSON.parse(localStorage.getItem('favoriteProducts')) || [];
+                const storedFavorites = await fetchFavoriteProducts();
                 setFavorites(new Set(storedFavorites));
             } catch (error) {
                 console.error('Error fetching products:', error);
             }
         };
 
+        const fetchFavoriteProducts = async () => {
+            try {
+                const response = await axios.get(`/api/favorites/list?userId=${userId}`);
+                return response.data || [];
+            } catch (error) {
+                console.error('Error fetching favorite products:', error);
+                return [];
+            }
+        };
+
         fetchProducts();
-    }, [categoryName]);
+    }, [categoryName, userId]);
 
     const handleSearchChange = (e) => {
         setSearchTerm(e.target.value.toLowerCase());
@@ -81,14 +90,13 @@ const ProductView = () => {
 
         try {
             if (isFavorite) {
+                await axios.post('/api/favorites/remove', null, { params: { userId, productId } });
                 newFavorites.delete(productId);
-                await removeFavoriteProduct(userId, productId);
             } else {
+                await axios.post('/api/favorites/add', null, { params: { userId, productId } });
                 newFavorites.add(productId);
-                await addFavoriteProduct(userId, productId);
             }
 
-            localStorage.setItem('favoriteProducts', JSON.stringify([...newFavorites]));
             setFavorites(newFavorites);
         } catch (error) {
             console.error('Error toggling favorite:', error);
