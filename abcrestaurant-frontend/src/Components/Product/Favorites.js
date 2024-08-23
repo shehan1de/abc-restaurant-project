@@ -1,111 +1,179 @@
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import '../../CSS/Card.css';
 import Navigation2 from '../navigation2';
 
 const FavoritesPage = () => {
   const [favoriteProductIds, setFavoriteProductIds] = useState([]);
   const [productDetails, setProductDetails] = useState([]);
-  const [currentIndex, setCurrentIndex] = useState(0);
+  const [cart, setCart] = useState({});
+  const [favorites, setFavorites] = useState(new Set());
+  const navigate = useNavigate();
+  const user = JSON.parse(localStorage.getItem('user'));
+  const userId = user ? user.userId : null;
 
-  // Retrieve user ID from token
-  const getUserIdFromToken = () => {
-    const token = localStorage.getItem('token'); // Assuming token is stored in localStorage
-    if (token) {
-      try {
-        // Decode the token to get userId (assuming token contains userId)
-        const decodedToken = JSON.parse(atob(token.split('.')[1])); // Decode JWT token (assuming it’s a JWT)
-        return decodedToken.userId; // Adjust according to your token structure
-      } catch (error) {
-        console.error('Error decoding token:', error);
-      }
-    }
-    return null;
-  };
-
-  // Fetch favorite product IDs for the user
   useEffect(() => {
     const fetchFavoriteProductIds = async () => {
       try {
-        const userId = getUserIdFromToken();
-        if (userId) {
-          const response = await axios.get(`/api/favorites/list?userId=${userId}`);
-          if (response.data && Array.isArray(response.data.productIds)) {
-            setFavoriteProductIds(response.data.productIds);
-          } else {
-            console.error('Unexpected response format:', response.data);
-          }
-        } else {
-          console.error('User ID not found in token');
-        }
+        const response = await axios.get(`/api/favorites/list?userId=${userId}`);
+        setFavoriteProductIds(response.data);
+        setFavorites(new Set(response.data));
       } catch (error) {
         console.error('Error fetching favorite product IDs:', error);
       }
     };
 
     fetchFavoriteProductIds();
-  }, []);
+  }, [userId]);
 
-  // Fetch details for the current product
   useEffect(() => {
     const fetchProductDetails = async () => {
-      if (favoriteProductIds.length > 0 && currentIndex < favoriteProductIds.length) {
-        try {
-          const productId = favoriteProductIds[currentIndex];
-          const response = await axios.get(`/product/byProductId/${productId}`);
-          if (response.data) {
-            setProductDetails(prevDetails => {
-              // Check if product detail is already present
-              const existingDetail = prevDetails.find(detail => detail.productId === productId);
-              if (existingDetail) return prevDetails;
-              return [...prevDetails, response.data];
-            });
-          } else {
-            console.error('Unexpected response format for product details:', response.data);
-          }
-        } catch (error) {
-          console.error('Error fetching product details:', error);
-        }
+      try {
+        const productRequests = favoriteProductIds.map((productId) =>
+          axios.get(`/product/byProductId/${productId}`)
+        );
+        const responses = await Promise.all(productRequests);
+        const products = responses.map((response) => response.data);
+        setProductDetails(products);
+      } catch (error) {
+        console.error('Error fetching product details:', error);
       }
     };
 
-    fetchProductDetails();
-  }, [favoriteProductIds, currentIndex]);
+    if (favoriteProductIds.length > 0) {
+      fetchProductDetails();
+    }
+  }, [favoriteProductIds]);
 
-  const handleNext = () => {
-    if (currentIndex < favoriteProductIds.length - 1) {
-      setCurrentIndex(currentIndex + 1);
+  const handleQuantityChange = (productId, delta) => {
+    setCart((prevCart) => {
+      const newQuantity = Math.max((prevCart[productId]?.quantity || 0) + delta, 0);
+      const updatedCart = {
+        ...prevCart,
+        [productId]: {
+          ...(prevCart[productId] || {}),
+          quantity: newQuantity,
+        },
+      };
+      localStorage.setItem('cart', JSON.stringify(updatedCart));
+      return updatedCart;
+    });
+  };
+
+  const handleAddToCart = async (product) => {
+    try {
+      const currentQuantity = cart[product.productId]?.quantity || 0;
+      const newQuantity = currentQuantity + 1;
+
+      // Update the cart in the backend
+      await axios.post('/api/cart/add', {
+        userId,
+        productId: product.productId,
+        quantity: newQuantity,
+      });
+
+      // Update local cart state and localStorage
+      setCart((prevCart) => {
+        const updatedCart = {
+          ...prevCart,
+          [product.productId]: {
+            ...product,
+            quantity: newQuantity,
+          },
+        };
+        localStorage.setItem('cart', JSON.stringify(updatedCart));
+        return updatedCart;
+      });
+    } catch (error) {
+      console.error('Error adding product to cart:', error);
     }
   };
 
-  const handlePrevious = () => {
-    if (currentIndex > 0) {
-      setCurrentIndex(currentIndex - 1);
+  const toggleFavorite = async (productId) => {
+    if (!userId) {
+      console.log('User not logged in');
+      return;
+    }
+
+    const isFavorite = favorites.has(productId);
+    const newFavorites = new Set(favorites);
+
+    try {
+      if (isFavorite) {
+        await axios.post('/api/favorites/remove', null, { params: { userId, productId } });
+        newFavorites.delete(productId);
+        setFavoriteProductIds((prevIds) => prevIds.filter(id => id !== productId));
+        setProductDetails((prevProducts) => prevProducts.filter(product => product.productId !== productId));
+      } else {
+        await axios.post('/api/favorites/add', null, { params: { userId, productId } });
+        newFavorites.add(productId);
+        const response = await axios.get(`/product/byProductId/${productId}`);
+        setProductDetails(prev => [...prev, response.data]);
+      }
+
+      setFavorites(newFavorites);
+    } catch (error) {
+      console.error('Error toggling favorite:', error);
     }
   };
 
   return (
     <>
       <Navigation2 />
-      <div>
-        <h1>Favorite Products</h1>
-        {productDetails.length > 0 && productDetails[currentIndex] ? (
-          <div>
-            <h2>{productDetails[currentIndex].productName}</h2>
-            <img src={productDetails[currentIndex].productImage} alt={productDetails[currentIndex].productName} />
-            <p>Price: ${productDetails[currentIndex].productPrice}</p>
-            <p>Description: {productDetails[currentIndex].productDescription}</p>
-            {/* Add other product details here */}
-            <button onClick={handlePrevious} disabled={currentIndex === 0}>
-              Previous
-            </button>
-            <button onClick={handleNext} disabled={currentIndex === favoriteProductIds.length - 1}>
-              Next
-            </button>
-          </div>
-        ) : (
-          <p>Loading product details...</p>
-        )}
-      </div>
+      <h1 className="form-head-one">
+        <span>Favorites</span>
+      </h1>
+
+      {productDetails.length === 0 ? (
+        <div className="no-products-message">
+          <p>Currently, there are no favorite products available.</p>
+        </div>
+      ) : (
+        <div className="custom-row">
+          {productDetails.map((product) => (
+            <div className="custom-col" key={product.productId}>
+              <div className="custom-card">
+                <img
+                  src={`/images/${product.productImage}`}
+                  className="custom-card-img-top"
+                  alt={product.productName}
+                />
+                <div className="custom-card-body">
+                  <h5 className="custom-card-title">{product.productName}</h5>
+                  <p className="custom-card-text">Rs. {product.productPrice.toFixed(2)}</p>
+
+                  <div className="custom-favorite-icon" onClick={() => toggleFavorite(product.productId)}>
+                    <i className={`bi ${favorites.has(product.productId) ? 'bi-heart-fill' : 'bi-heart'}`}></i>
+                  </div>
+
+                  <div className="custom-quantity-controls">
+                    <button
+                      className="custom-btn custom-btn-outline-secondary"
+                      onClick={() => handleQuantityChange(product.productId, -1)}
+                    >
+                      <i className="bi bi-dash"></i>
+                    </button>
+                    <span className="custom-mx-2">{cart[product.productId]?.quantity || 0}</span>
+                    <button
+                      className="custom-btn custom-btn-outline-secondary"
+                      onClick={() => handleQuantityChange(product.productId, 1)}
+                    >
+                      <i className="bi bi-plus"></i>
+                    </button>
+                  </div>
+                  <button
+                    className="custom-btn custom-btn-primary custom-mt-2"
+                    onClick={() => handleAddToCart(product)}
+                  >
+                    Add to Cart
+                  </button>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
     </>
   );
 };

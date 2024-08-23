@@ -3,18 +3,22 @@ package com.abcRestaurant.abcRestaurant.Service;
 import com.abcRestaurant.abcRestaurant.Model.FavoriteProduct;
 import com.abcRestaurant.abcRestaurant.Model.Product;
 import com.abcRestaurant.abcRestaurant.Repository.FavoriteProductRepository;
+import com.abcRestaurant.abcRestaurant.Repository.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class FavoriteProductService {
 
     @Autowired
     private FavoriteProductRepository favoriteProductRepository;
-    private ProductService productService;
+
+    @Autowired
+    private ProductRepository productRepository;
 
     public void addFavoriteProduct(String userId, String productId) {
         FavoriteProduct favoriteProduct = favoriteProductRepository.findByUserId(userId);
@@ -40,10 +44,13 @@ public class FavoriteProductService {
             List<String> productIds = favoriteProduct.getProductId();
             productIds.remove(productId);
 
+            // Save changes to the repository
             favoriteProductRepository.save(favoriteProduct);
+            if (productIds.isEmpty()) {
+                favoriteProductRepository.deleteById(favoriteProduct.getId().toString());
+            }
         }
     }
-
     public List<String> getFavoriteProducts(String userId) {
         FavoriteProduct favoriteProduct = favoriteProductRepository.findByUserId(userId);
         return favoriteProduct != null ? favoriteProduct.getProductId() : new ArrayList<>();
@@ -51,11 +58,16 @@ public class FavoriteProductService {
 
     public List<Product> getFavoriteProductDetails(String userId) {
         FavoriteProduct favoriteProduct = favoriteProductRepository.findByUserId(userId);
-        if (favoriteProduct != null && favoriteProduct.getProductId() != null && !favoriteProduct.getProductId().isEmpty()) {
-            return productService.findProductsByIds(favoriteProduct.getProductId());
-        } else {
-            return new ArrayList<>();
+        List<Product> favoriteProducts = new ArrayList<>();
+
+        if (favoriteProduct != null && favoriteProduct.getProductId() != null) {
+            for (String productId : favoriteProduct.getProductId()) {
+                Optional<Product> product = productRepository.findByProductId(productId); // Use Optional to handle null
+                product.ifPresent(favoriteProducts::add); // If product is present, add it to the list
+            }
         }
+
+        return favoriteProducts;
     }
 
 

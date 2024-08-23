@@ -24,13 +24,20 @@ public class FavoriteProductController {
     }
 
     @PostMapping("/remove")
-    public void removeFavoriteProduct(@RequestParam String userId, @RequestParam String productId) {
+    public ResponseEntity<Void> removeFavoriteProduct(@RequestParam String userId, @RequestParam String productId) {
         favoriteProductService.removeFavoriteProduct(userId, productId);
+        return ResponseEntity.ok().build();
     }
 
     @GetMapping("/list")
     public List<String> getFavoriteProducts(@RequestParam String userId) {
         return favoriteProductService.getFavoriteProducts(userId);
+    }
+
+    @GetMapping("/details")
+    public ResponseEntity<List<Product>> getFavoriteProductDetails(@RequestParam String userId) {
+        List<Product> favoriteProducts = favoriteProductService.getFavoriteProductDetails(userId);
+        return new ResponseEntity<>(favoriteProducts, HttpStatus.OK);
     }
 
 }
