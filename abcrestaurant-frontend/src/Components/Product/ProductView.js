@@ -1,6 +1,8 @@
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import '../../CSS/Card.css';
 import Navigation2 from '../navigation2';
 
@@ -10,34 +12,36 @@ const ProductView = () => {
     const [searchTerm, setSearchTerm] = useState('');
     const [cart, setCart] = useState({});
     const [favorites, setFavorites] = useState(new Set());
+    const [productQuantities, setProductQuantities] = useState({});
     const navigate = useNavigate();
     const user = JSON.parse(localStorage.getItem('user'));
     const userId = user ? user.userId : null;
 
     useEffect(() => {
-        const fetchProducts = async () => {
+        const fetchData = async () => {
             try {
-                const response = await axios.get(`/product?categoryName=${encodeURIComponent(categoryName)}`);
-                setProducts(response.data);
+                // Fetch products based on category
+                const productResponse = await axios.get(`/product?categoryName=${encodeURIComponent(categoryName)}`);
+                setProducts(productResponse.data);
 
-                const storedFavorites = await fetchFavoriteProducts();
-                setFavorites(new Set(storedFavorites));
+                // Fetch favorite products for the logged-in user
+                const favoritesResponse = await axios.get(`/api/favorites/list?userId=${userId}`);
+                setFavorites(new Set(favoritesResponse.data || []));
+
+                // Fetch cart details for the logged-in user
+                const cartResponse = await axios.get(`/api/cart/details?userId=${userId}`);
+                const cartData = cartResponse.data;
+                const cartItems = cartData.productId || {};
+                setCart(cartItems);
+                setProductQuantities(cartItems); // Initialize product quantities from cart data
             } catch (error) {
-                console.error('Error fetching products:', error);
+                console.error('Error fetching data:', error);
             }
         };
 
-        const fetchFavoriteProducts = async () => {
-            try {
-                const response = await axios.get(`/api/favorites/list?userId=${userId}`);
-                return response.data || [];
-            } catch (error) {
-                console.error('Error fetching favorite products:', error);
-                return [];
-            }
-        };
-
-        fetchProducts();
+        if (userId) {
+            fetchData();
+        }
     }, [categoryName, userId]);
 
     const handleSearchChange = (e) => {
@@ -49,33 +53,53 @@ const ProductView = () => {
     );
 
     const handleQuantityChange = (productId, delta) => {
-        setCart(prevCart => {
-            const newQuantity = Math.max((prevCart[productId]?.quantity || 0) + delta, 0);
-            const updatedCart = {
-                ...prevCart,
-                [productId]: {
-                    ...(prevCart[productId] || {}),
-                    quantity: newQuantity
-                }
+        setProductQuantities(prevQuantities => {
+            const currentQuantity = prevQuantities[productId] || 0;
+            const newQuantity = Math.max(currentQuantity + delta, 0);
+            return {
+                ...prevQuantities,
+                [productId]: newQuantity
             };
-            localStorage.setItem('cart', JSON.stringify(updatedCart));
-            return updatedCart;
         });
     };
 
-    const handleAddToCart = (product) => {
-        if (cart[product.productId]?.quantity > 0) {
-            const newCart = {
-                ...cart,
-                [product.productId]: {
-                    ...product,
-                    quantity: (cart[product.productId]?.quantity || 0) + 1
-                }
-            };
-            setCart(newCart);
-            localStorage.setItem('cart', JSON.stringify(newCart));
-        } else {
-            console.log('Quantity must be greater than 0');
+    const handleAddToCart = async (product) => {
+        try {
+            const quantity = productQuantities[product.productId] || 0;
+
+            if (quantity > 0) {
+                const updatedCart = {
+                    ...cart,
+                    [product.productId]: quantity
+                };
+
+                await axios.post('/api/cart/add', null, {
+                    params: {
+                        userId,
+                        productId: product.productId,
+                        quantity
+                    }
+                });
+
+                toast.success('Product added to cart!', {
+                    position: 'top-center',
+                    autoClose: 1000
+                });
+
+                setCart(updatedCart);
+                localStorage.setItem('cart', JSON.stringify(updatedCart));
+            } else {
+                toast.warn('Quantity must be greater than 0', {
+                    position: 'top-center',
+                    autoClose: 1000
+                });
+            }
+        } catch (error) {
+            console.error('Error adding product to cart:', error);
+            toast.error('Error adding product to cart.', {
+                position: 'top-center',
+                autoClose: 1000
+            });
         }
     };
 
@@ -154,7 +178,7 @@ const ProductView = () => {
                                         >
                                             <i className="bi bi-dash"></i>
                                         </button>
-                                        <span className="custom-mx-2">{cart[product.productId]?.quantity || 0}</span>
+                                        <span className="custom-mx-2">{productQuantities[product.productId] || 0}</span>
                                         <button
                                             className="custom-btn custom-btn-outline-secondary"
                                             onClick={() => handleQuantityChange(product.productId, 1)}
@@ -174,6 +198,7 @@ const ProductView = () => {
                     ))}
                 </div>
             )}
+            <ToastContainer />
         </>
     );
 };

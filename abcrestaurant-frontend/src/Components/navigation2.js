@@ -69,7 +69,7 @@ const SecNavigation = () => {
                             <Link className={`nav-link ${location.pathname === '/favorites' ? 'active' : ''}`} to="/favorites">Favorites</Link>
                         </li>
                         <li className="nav-item">
-                            <Link className={`nav-link ${location.pathname === '/customer/cart' ? 'active' : ''}`} to="/customer/cart">Cart</Link>
+                            <Link className={`nav-link ${location.pathname === '/cart' ? 'active' : ''}`} to="/cart">Cart</Link>
                         </li>
                         <li className="nav-item">
                             <Link className={`nav-link ${location.pathname === '/customer/purchases' ? 'active' : ''}`} to="/customer/purchases">Purchases</Link>

@@ -18,5 +18,5 @@ public class Cart {
     private ObjectId id;
     private String userId;
     private Map<String, Integer> productId;
-    private double totalAmount;
+    private float totalAmount;
 }

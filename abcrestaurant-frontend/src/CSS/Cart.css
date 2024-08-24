@@ -1,0 +1,169 @@
+.cart-header {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 25px;
+    margin: 50px;
+    font-family: 'Inria Sans', sans-serif;
+    color: white;
+}
+
+.total-amount {
+    font-weight: bold;
+    font-size: 1.2rem;
+    margin-right: 25px;
+}
+
+.btn-btn-warning {
+    font-size: 1rem;
+    padding: 5px 15px;
+    border-radius: 4px;
+    transition: all 0.3s ease;
+    width: 180px;
+    height: 50px;
+    margin: 10px;
+    background-color: #A69003;
+    color: white;
+    border: none;
+}
+
+.btn-btn-danger-me-2 {
+    font-size: 1rem;
+    padding: 5px 15px;
+    border-radius: 4px;
+    transition: all 0.3s ease;
+    width: 180px;
+    height: 50px;
+    margin: 10px;
+    background-color: red;
+    color: white;
+    border: none;
+}
+
+.btn-btn-danger-me-2:hover {
+    background-color: rgb(152, 0, 0);
+    color: white;
+}
+
+.btn-btn-warning:hover {
+    background-color: #706102;
+    color: white;
+}
+
+.large-icon {
+    font-size: 2rem;
+}
+
+.fs-3 {
+    font-size: 1.75rem;
+}
+
+
+
+
+/* Card Styles */
+.card-custom-card {
+    display: flex;
+    flex-direction: row;
+    margin: 20px auto;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 0.5rem;
+    overflow: hidden;
+    width: calc(100% - 40px);
+    max-width: 750px;
+    font-family: 'Inria Sans', sans-serif;
+    height: 190px;
+    background-color: #d6d6d6;
+    align-items: center;
+    animation: fadeInUp 1s ease-in-out;
+}
+
+.card-img {
+    flex: 0 0 170px;
+    height: 170px;
+    object-fit: cover;
+    text-align: left;
+    border-radius: 10px;
+    margin-left: 10px;
+}
+
+.card-body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 15px;
+    text-align: left;
+}
+
+.card-product-info {
+    margin-bottom: 10px;
+}
+
+.card-product-name {
+    font-size: 1.25rem;
+    font-weight: bold;
+    margin-bottom: 15px;
+}
+
+.card-product-description {
+    font-size: 0.8rem;
+    margin-bottom: 5px;
+}
+
+.card-product-quantity {
+    font-size: 1rem;
+    font-weight: bold;
+}
+
+.card-product-subtotal {
+    font-size: 1.3rem;
+    font-weight: bold;
+    text-align: right;
+    margin: 0;
+}
+
+.card-clear-btn {
+    background-color: transparent;
+    color: red;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 10px;
+    align-self: flex-start;
+    align-items: center;
+}
+
+.card-clear-btn:hover {
+    color: rgb(147, 0, 0);
+}
+
+.cart-items-container {
+    margin: 20px auto;
+}
+
+@media (max-width: 768px) {
+    .card-custom-card {
+        flex-direction: column;
+        width: 100%;
+    }
+
+    .card-img {
+        width: 100%;
+        height: auto;
+    }
+
+    .card-body {
+        padding: 10px;
+    }
+
+    .card-product-subtotal {
+        text-align: left;
+    }
+}
+
+.card-custom-card:hover {
+    background-color: #9a9898;
+}
+

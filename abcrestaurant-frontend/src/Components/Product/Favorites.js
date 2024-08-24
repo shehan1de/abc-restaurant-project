@@ -1,7 +1,9 @@
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
 import '../../CSS/Card.css';
+import CustomToastContainer from '../CustomToastContainer';
 import Navigation2 from '../navigation2';
 
 const FavoritesPage = () => {
@@ -46,15 +48,34 @@ const FavoritesPage = () => {
     }
   }, [favoriteProductIds]);
 
-  const handleQuantityChange = (productId, delta) => {
+
+  
+  useEffect(() => {
+    const fetchCartDetails = async () => {
+      try {
+        const response = await axios.get(`/api/cart/details?userId=${userId}`);
+        const cartData = response.data;
+        const cartItems = cartData.productId || {};
+        setCart(cartItems);
+      } catch (error) {
+        console.error('Error fetching cart details:', error);
+      }
+    };
+
+    if (userId) {
+      fetchCartDetails();
+    }
+  }, [userId]);
+
+
+
+  const handleQuantityChange = (productId, quantity) => {
+    if (quantity < 0) return;
+
     setCart((prevCart) => {
-      const newQuantity = Math.max((prevCart[productId]?.quantity || 0) + delta, 0);
       const updatedCart = {
         ...prevCart,
-        [productId]: {
-          ...(prevCart[productId] || {}),
-          quantity: newQuantity,
-        },
+        [productId]: quantity,
       };
       localStorage.setItem('cart', JSON.stringify(updatedCart));
       return updatedCart;
@@ -63,30 +84,20 @@ const FavoritesPage = () => {
 
   const handleAddToCart = async (product) => {
     try {
-      const currentQuantity = cart[product.productId]?.quantity || 0;
-      const newQuantity = currentQuantity + 1;
+      const quantity = cart[product.productId] || 0;
 
-      // Update the cart in the backend
-      await axios.post('/api/cart/add', {
-        userId,
-        productId: product.productId,
-        quantity: newQuantity,
+      await axios.post('/api/cart/add', null, {
+        params: {
+          userId,
+          productId: product.productId,
+          quantity,
+        }
       });
 
-      // Update local cart state and localStorage
-      setCart((prevCart) => {
-        const updatedCart = {
-          ...prevCart,
-          [product.productId]: {
-            ...product,
-            quantity: newQuantity,
-          },
-        };
-        localStorage.setItem('cart', JSON.stringify(updatedCart));
-        return updatedCart;
-      });
+      toast.success('Cart Updated Successfully!');
     } catch (error) {
       console.error('Error adding product to cart:', error);
+      toast.error('Error adding product to cart.');
     }
   };
 
@@ -150,18 +161,19 @@ const FavoritesPage = () => {
                   <div className="custom-quantity-controls">
                     <button
                       className="custom-btn custom-btn-outline-secondary"
-                      onClick={() => handleQuantityChange(product.productId, -1)}
+                      onClick={() => handleQuantityChange(product.productId, Math.max((cart[product.productId] || 0) - 1, 0))}
                     >
                       <i className="bi bi-dash"></i>
                     </button>
-                    <span className="custom-mx-2">{cart[product.productId]?.quantity || 0}</span>
+                    <span className="custom-mx-2">{cart[product.productId] || 0}</span>
                     <button
                       className="custom-btn custom-btn-outline-secondary"
-                      onClick={() => handleQuantityChange(product.productId, 1)}
+                      onClick={() => handleQuantityChange(product.productId, (cart[product.productId] || 0) + 1)}
                     >
                       <i className="bi bi-plus"></i>
                     </button>
                   </div>
+
                   <button
                     className="custom-btn custom-btn-primary custom-mt-2"
                     onClick={() => handleAddToCart(product)}
@@ -174,6 +186,8 @@ const FavoritesPage = () => {
           ))}
         </div>
       )}
+
+      <CustomToastContainer />
     </>
   );
 };

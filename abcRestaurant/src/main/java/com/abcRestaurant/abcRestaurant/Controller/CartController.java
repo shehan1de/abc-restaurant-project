@@ -7,6 +7,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
+
 @RestController
 @RequestMapping("/api/cart")
 public class CartController {
@@ -15,16 +17,24 @@ public class CartController {
     private CartService cartService;
 
     @PostMapping("/add")
-    public ResponseEntity<Void> addToCart(@RequestParam String userId, @RequestParam String productId, @RequestParam int quantity) {
+    public ResponseEntity<Void> addToCart(
+            @RequestParam String userId,
+            @RequestParam String productId,
+            @RequestParam int quantity) {
         cartService.addToCart(userId, productId, quantity);
         return ResponseEntity.ok().build();
     }
 
-    @PostMapping("/remove")
-    public ResponseEntity<Void> removeFromCart(@RequestParam String userId, @RequestParam String productId) {
-        cartService.removeFromCart(userId, productId);
+    @DeleteMapping("/remove")
+    public ResponseEntity<Void> removeFromCart(
+            @RequestParam String userId,
+            @RequestParam String productId,
+            @RequestParam int quantity) {
+        cartService.removeFromCart(userId, productId, quantity);
         return ResponseEntity.ok().build();
     }
+
+
 
     @GetMapping("/details")
     public ResponseEntity<Cart> getCartDetails(@RequestParam String userId) {
@@ -32,4 +42,16 @@ public class CartController {
         return new ResponseEntity<>(cart, HttpStatus.OK);
     }
 
+    @GetMapping("/detailsInfo")
+    public ResponseEntity<Map<String, Object>> getCartDetailsWithProductInfo(@RequestParam String userId) {
+        Map<String, Object> cartDetails = cartService.getCartDetailsWithProductInfo(userId);
+
+        if (cartDetails != null) {
+            return new ResponseEntity<>(cartDetails, HttpStatus.OK);
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+    }
+
 }
+

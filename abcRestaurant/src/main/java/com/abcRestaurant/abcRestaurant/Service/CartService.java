@@ -5,11 +5,17 @@ import com.abcRestaurant.abcRestaurant.Model.Product;
 import com.abcRestaurant.abcRestaurant.Repository.CartRepository;
 import com.abcRestaurant.abcRestaurant.Repository.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class CartService {
@@ -20,7 +26,7 @@ public class CartService {
     @Autowired
     private ProductRepository productRepository;
 
-    // Method to add a product to the cart
+
     public void addToCart(String userId, String productId, int quantity) {
         Cart cart = cartRepository.findByUserId(userId);
 
@@ -31,29 +37,36 @@ public class CartService {
         }
 
         Map<String, Integer> products = cart.getProductId();
-        products.put(productId, products.getOrDefault(productId, 0) + quantity);
 
-        // Recalculate total amount after adding the product
-        double totalAmount = calculateTotalAmount(products);
+        products.put(productId, quantity);
+
+
+        float totalAmount = (float) calculateTotalAmount(products);
         cart.setTotalAmount(totalAmount);
 
         cartRepository.save(cart);
     }
 
-    // Method to remove a product from the cart
-    public void removeFromCart(String userId, String productId) {
+    public void removeFromCart(String userId, String productId, int quantityToRemove) {
         Cart cart = cartRepository.findByUserId(userId);
 
         if (cart != null) {
             Map<String, Integer> products = cart.getProductId();
             if (products.containsKey(productId)) {
-                products.remove(productId);
+                int currentQuantity = products.get(productId);
+                int newQuantity = currentQuantity - quantityToRemove;
 
-                // Recalculate total amount after removing the product
-                double totalAmount = calculateTotalAmount(products);
+                if (newQuantity <= 0) {
+                    products.remove(productId);
+                } else {
+                    products.put(productId, newQuantity);
+                }
+
+                float totalAmount = (float) calculateTotalAmount(products);
                 cart.setTotalAmount(totalAmount);
 
                 cartRepository.save(cart);
+
                 if (products.isEmpty()) {
                     cartRepository.deleteById(cart.getId().toString());
                 }
@@ -61,33 +74,68 @@ public class CartService {
         }
     }
 
-    // Method to get the cart details
+
     public Cart getCart(String userId) {
         return cartRepository.findByUserId(userId);
     }
 
-    // Helper method to calculate the total amount
     private double calculateTotalAmount(Map<String, Integer> products) {
         double totalAmount = 0.0;
 
-        // Loop through each product in the cart
         for (Map.Entry<String, Integer> entry : products.entrySet()) {
             String productId = entry.getKey();
             int quantity = entry.getValue();
 
-            // Fetch the product price from the Product collection
             Optional<Product> productOpt = productRepository.findByProductId(productId);
             if (productOpt.isPresent()) {
                 Product product = productOpt.get();
                 double productPrice = product.getProductPrice();
 
-                // Calculate total amount for the current product
+
                 totalAmount += (productPrice * quantity);
             }
         }
 
-        // Return the calculated total amount
         return totalAmount;
     }
 
+    public Map<String, Object> getCartDetailsWithProductInfo(String userId) {
+        Cart cart = cartRepository.findByUserId(userId);
+
+        if (cart == null) {
+            return null;
+        }
+
+        Map<String, Integer> cartProducts = cart.getProductId();
+        Map<String, Object> detailedCart = new HashMap<>();
+        detailedCart.put("userId", userId);
+        detailedCart.put("totalAmount", cart.getTotalAmount());
+
+        List<Map<String, Object>> productDetailsList = cartProducts.entrySet().stream()
+                .map(entry -> {
+                    String productId = entry.getKey();
+                    int quantity = entry.getValue();
+                    Optional<Product> productOpt = productRepository.findByProductId(productId);
+
+                    if (productOpt.isPresent()) {
+                        Product product = productOpt.get();
+                        Map<String, Object> productDetails = new HashMap<>();
+                        productDetails.put("productId", productId);
+                        productDetails.put("productName", product.getProductName());
+                        productDetails.put("productImage", product.getProductImage());
+                        productDetails.put("productDescription", product.getProductDescription());
+                        productDetails.put("productPrice", product.getProductPrice());
+                        productDetails.put("quantity", quantity);
+                        return productDetails;
+                    } else {
+                        return null;
+                    }
+                })
+                .filter(productDetails -> productDetails != null)
+                .collect(Collectors.toList());
+
+        detailedCart.put("products", productDetailsList);
+        return detailedCart;
+    }
 }
+

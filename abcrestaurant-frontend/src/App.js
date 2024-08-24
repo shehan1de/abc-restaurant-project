@@ -6,6 +6,7 @@ import ForgetPw2 from './Components/auth/ForgetPw2';
 import Login from './Components/auth/Login';
 import Register from './Components/auth/Register';
 import ResetPw from './Components/auth/ResetPw';
+import Cart from './Components/Cart/Cart';
 import Contact from './Components/Contact';
 import AdminDashboard from './Components/Dashboard/AdminDashboard';
 import CustomerDashboard from './Components/Dashboard/CustomerDashboard';
@@ -40,6 +41,7 @@ function App() {
         <Route path="/customer-dashboard" element={<ProtectedRoute element={CustomerDashboard} allowedRoles={['Customer']} />} />
         <Route path="/products/:categoryName" element={<ProtectedRoute element={ProductView} allowedRoles={['Customer', 'Admin', 'Staff']} />} />
         <Route path="/favorites" element={<ProtectedRoute element={Favorites} allowedRoles={['Customer']} />} />
+        <Route path="/cart" element={<ProtectedRoute element={Cart} allowedRoles={['Customer']} />} />
       </Routes>
     </Router>
   );
