@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -14,6 +15,7 @@ public class EmailService {
     @Autowired
     private JavaMailSender emailSender;
 
+    @Async
     public void sendReservationConfirmation(String to, String reservationId, String bookingSeats, String date, String time, String branch) {
         try {
             MimeMessage mimeMessage = emailSender.createMimeMessage();
