@@ -15,7 +15,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 public class Offer {
     @Id
     private ObjectId id;
-    private String couponCode;
+    private String offerId;
     private String offerDescription;
     private String offerName;
     private float offerValue;

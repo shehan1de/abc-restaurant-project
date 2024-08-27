@@ -9,6 +9,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.List;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -28,5 +29,17 @@ public class User {
     private String verificationCode;
     private LocalDateTime verificationCodeExpiry;
 
+
+    public void updateProfile(String username, Long phoneNumber, String profilePicture) {
+        if (username != null && !username.isEmpty()) {
+            this.username = username;
+        }
+        if (phoneNumber != null && phoneNumber > 0) {
+            this.phoneNumber = phoneNumber;
+        }
+        if (profilePicture != null && !profilePicture.isEmpty()) {
+            this.profilePicture = profilePicture;
+        }
+    }
 }
 

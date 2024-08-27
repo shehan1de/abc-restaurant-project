@@ -8,22 +8,23 @@ import com.abcRestaurant.abcRestaurant.Exception.ResourceNotFoundException;
 import com.abcRestaurant.abcRestaurant.Model.User;
 import com.abcRestaurant.abcRestaurant.Repository.UserRepository;
 import com.abcRestaurant.abcRestaurant.Security.JwtUtil;
-import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.Random;
+import java.util.*;
 
 @Service
 public class UserService implements UserDetailsService {
@@ -54,8 +55,8 @@ public class UserService implements UserDetailsService {
         return userRepository.findAll();
     }
 
-    public Optional<User> singleUser(ObjectId id) {
-        return userRepository.findById(id);
+    public Optional<User> singleUser(String userId) {
+        return userRepository.findByUserId(userId);
     }
 
     public User addUser(UserRequestDTO userRequestDTO) {
@@ -73,25 +74,24 @@ public class UserService implements UserDetailsService {
         return userRepository.save(user);
     }
 
-
     private String generateUserId() {
         long count = userRepository.count();
         return String.format("user-%03d", count + 1);
     }
 
-    public User updateUser(ObjectId id, User user) {
-        if (!userRepository.existsById(id)) {
-            throw new ResourceNotFoundException("User not found with id " + id);
+    public User updateUser(String userId, User user) {
+        if (!userRepository.existsByUserId(userId)) {
+            throw new ResourceNotFoundException("User not found with id " + userId);
         }
-        user.setId(id);
+        user.setUserId(userId);
         return userRepository.save(user);
     }
 
-    public void deleteUser(ObjectId id) {
-        if (!userRepository.existsById(id)) {
-            throw new ResourceNotFoundException("User not found with id " + id);
+    public void deleteUser(String userId) {
+        if (!userRepository.existsByUserId(userId)) {
+            throw new ResourceNotFoundException("User not found with id " + userId);
         }
-        userRepository.deleteById(id);
+        userRepository.deleteByUserId(userId);
     }
 
     public AuthResponseDTO loginUser(AuthRequestDTO authRequestDTO) {
@@ -99,7 +99,7 @@ public class UserService implements UserDetailsService {
                 .orElseThrow(() -> new ResourceNotFoundException("User not found with email " + authRequestDTO.getUserEmail()));
         if (passwordEncoder.matches(authRequestDTO.getPassword(), user.getPassword())) {
             String token = jwtUtil.generateToken(user);
-            UserResponseDTO userResponseDTO = new UserResponseDTO(user.getUserId(), user.getUsername(), user.getUserEmail(), user.getPhoneNumber(), user.getUserType(),user.getProfilePicture());
+            UserResponseDTO userResponseDTO = new UserResponseDTO(user.getUserId(), user.getUsername(), user.getUserEmail(), user.getPhoneNumber(), user.getUserType(), user.getProfilePicture());
             return new AuthResponseDTO(token, userResponseDTO);
         } else {
             throw new RuntimeException("Invalid credentials");
@@ -163,5 +163,59 @@ public class UserService implements UserDetailsService {
             user.setVerificationCodeExpiry(null);
             userRepository.save(user);
         }
+    }
+
+    public User updateUserProfile(String userId, String username, Long phoneNumber, MultipartFile profilePicture) throws IOException {
+        User user = userRepository.findByUserId(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with id " + userId));
+
+        // Handle profile picture upload
+        String profilePictureFilename = handleProfilePictureUpload(profilePicture);
+
+        // Update user details
+        if (username != null) {
+            user.setUsername(username);
+        }
+        if (phoneNumber != null) {
+            user.setPhoneNumber(phoneNumber);
+        }
+        if (profilePictureFilename != null) {
+            user.setProfilePicture(profilePictureFilename);
+        }
+
+        // Save and return updated user
+        return userRepository.save(user);
+    }
+
+
+    @Value("${upload.path}")
+    private String uploadPath; // Path for file upload, defined in application.properties
+
+    public String handleProfilePictureUpload(MultipartFile profilePicture) throws IOException {
+        if (profilePicture != null && !profilePicture.isEmpty()) {
+            String timestamp = new SimpleDateFormat("yyyyMMddHHmmss").format(new Date());
+            String originalFilename = profilePicture.getOriginalFilename();
+
+            // Extract file extension
+            String fileExtension = "";
+            if (originalFilename != null && originalFilename.contains(".")) {
+                fileExtension = originalFilename.substring(originalFilename.lastIndexOf('.'));
+            }
+
+            // Construct new filename
+            String profilePictureFilename = "propic-" + timestamp + fileExtension;
+
+            // Define the upload path
+            File file = new File(uploadPath, profilePictureFilename);
+
+            // Ensure directory exists
+            file.getParentFile().mkdirs();
+
+            // Save the file
+            profilePicture.transferTo(file);
+
+            return profilePictureFilename;
+        }
+        return null;
     }
 }

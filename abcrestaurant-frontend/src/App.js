@@ -1,6 +1,7 @@
 import React from 'react';
 import { Route, BrowserRouter as Router, Routes } from 'react-router-dom';
 import AboutABC from './Components/AboutABC';
+import ChangeProfile from './Components/auth/ChangeProfile';
 import ForgetPw1 from './Components/auth/ForgetPw1';
 import ForgetPw2 from './Components/auth/ForgetPw2';
 import Login from './Components/auth/Login';
@@ -13,6 +14,8 @@ import CustomerDashboard from './Components/Dashboard/CustomerDashboard';
 import StaffDashboard from './Components/Dashboard/StaffDashboard';
 import Gallery from './Components/Gallery';
 import Index from './Components/Index';
+import Checkout from './Components/Order/Checkout';
+import Purchases from './Components/Order/Purchases';
 import Favorites from './Components/Product/Favorites';
 import Menu from './Components/Product/Menu';
 import ProductView from './Components/Product/ProductView';
@@ -39,9 +42,13 @@ function App() {
         <Route path="/admin-dashboard" element={<ProtectedRoute element={AdminDashboard} allowedRoles={['Admin']} />} />
         <Route path="/staff-dashboard" element={<ProtectedRoute element={StaffDashboard} allowedRoles={['Staff']} />} />
         <Route path="/customer-dashboard" element={<ProtectedRoute element={CustomerDashboard} allowedRoles={['Customer']} />} />
-        <Route path="/products/:categoryName" element={<ProtectedRoute element={ProductView} allowedRoles={['Customer', 'Admin', 'Staff']} />} />
+        <Route path="/products/:categoryName" element={<ProtectedRoute element={ProductView} allowedRoles={['Customer']} />} />
+        <Route path="/product/:productId" element={<ProtectedRoute element={ProductView} allowedRoles={['Customer']} />} />
         <Route path="/favorites" element={<ProtectedRoute element={Favorites} allowedRoles={['Customer']} />} />
         <Route path="/cart" element={<ProtectedRoute element={Cart} allowedRoles={['Customer']} />} />
+        <Route path="/checkout" element={<ProtectedRoute element={Checkout} allowedRoles={['Customer']} />} />
+        <Route path="/purchases" element={<ProtectedRoute element={Purchases} allowedRoles={['Customer']} />} />
+        <Route path="/change-profile" element={<ProtectedRoute element={ChangeProfile} allowedRoles={['Customer']} />} />
       </Routes>
     </Router>
   );

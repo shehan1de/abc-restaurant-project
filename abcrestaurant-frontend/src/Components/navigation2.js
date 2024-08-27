@@ -14,6 +14,7 @@ const SecNavigation = () => {
         email: '',
         profilePicture: defaultProfilePic
     });
+    const [showModal, setShowModal] = useState(false);
 
     useEffect(() => {
         const token = localStorage.getItem('token');
@@ -28,6 +29,10 @@ const SecNavigation = () => {
     }, []);
 
     const handleLogout = () => {
+        setShowModal(true);
+    };
+
+    const handleConfirmLogout = () => {
         Swal.fire({
             title: 'Logging out...',
             text: 'Please wait',
@@ -48,62 +53,106 @@ const SecNavigation = () => {
             }).then(() => {
                 navigate('/login');
             });
-        },);
+        }, 0);
     };
 
     return (
-        <nav className="navbar navbar-expand-lg navbar-transparent">
-            <div className="container-fluid">
-                <div className="navbar-brand" to="/">
-                    <span className="navbar-brand-text">ABC RESTAURANT</span>
-                </div>
-                <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
-                    <span className="navbar-toggler-icon"></span>
-                </button>
-                <div className="collapse navbar-collapse flex-grow-1 justify-content-center" id="navbarNavDropdown">
-                    <ul className="navbar-nav">
-                        <li className="nav-item">
-                            <Link className={`nav-link ${location.pathname === '/customer-dashboard' ? 'active' : ''}`} to="/customer-dashboard">Home</Link>
-                        </li>
-                        <li className="nav-item">
-                            <Link className={`nav-link ${location.pathname === '/favorites' ? 'active' : ''}`} to="/favorites">Favorites</Link>
-                        </li>
-                        <li className="nav-item">
-                            <Link className={`nav-link ${location.pathname === '/cart' ? 'active' : ''}`} to="/cart">Cart</Link>
-                        </li>
-                        <li className="nav-item">
-                            <Link className={`nav-link ${location.pathname === '/customer/purchases' ? 'active' : ''}`} to="/customer/purchases">Purchases</Link>
-                        </li>
-                        <li className="nav-item">
-                            <button className="btn btn-gold nav-link" onClick={handleLogout}>Logout</button>
-                        </li>
-                    </ul>
-                </div>
-                <div className="profile-container d-flex align-items-center">
-                    <img src={`/images/${user.profilePicture}`} alt="Profile" className="profile-pic" />
-                    <div className="profile-info ms-2">
-                        <span className="username">{user.username}</span>
-                        <br />
-                        <span className="email">{user.email}</span>
+        <>
+            <nav className="navbar navbar-expand-lg navbar-transparent">
+                <div className="container-fluid">
+                    <div className="navbar-brand" to="/">
+                        <span className="navbar-brand-text">ABC RESTAURANT</span>
                     </div>
-                    <div className="dropdown ms-3">
-                        <button
-                            className="btn btn-secondary dropdown-toggle"
-                            type="button"
-                            id="dropdownMenuButton"
-                            data-bs-toggle="dropdown"
-                            aria-expanded="false"
-                        >
-                            <i className="bi bi-gear"></i>
-                        </button>
-                        <ul className="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                            <li><Link className="dropdown-item" to="/profile">Change Profile</Link></li>
-                            <li><Link className="dropdown-item" to="/change-password">Change Password</Link></li>
+                    <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+                        <span className="navbar-toggler-icon"></span>
+                    </button>
+                    <div className="collapse navbar-collapse flex-grow-1 justify-content-center" id="navbarNavDropdown">
+                        <ul className="navbar-nav">
+                            <li className="nav-item">
+                                <Link className={`nav-link ${location.pathname === '/customer-dashboard' ? 'active' : ''}`} to="/customer-dashboard">Home</Link>
+                            </li>
+                            <li className="nav-item">
+                                <Link className={`nav-link ${location.pathname === '/favorites' ? 'active' : ''}`} to="/favorites">Favorites</Link>
+                            </li>
+                            <li className="nav-item">
+                                <Link className={`nav-link ${location.pathname === '/cart' ? 'active' : ''}`} to="/cart">Cart</Link>
+                            </li>
+                            <li className="nav-item">
+                                <Link className={`nav-link ${location.pathname === '/purchases' ? 'active' : ''}`} to="/purchases">Purchases</Link>
+                            </li>
+                            <li className="nav-item">
+                                <button className="btn btn-gold nav-link" onClick={handleLogout}>Logout</button>
+                            </li>
                         </ul>
                     </div>
+                    <div className="profile-container d-flex align-items-center">
+                        <img src={`/images/${user.profilePicture}`} alt="Profile" className="profile-pic" />
+                        <div className="profile-info ms-2">
+                            <span className="username">{user.username}</span>
+                            <br />
+                            <span className="email">{user.email}</span>
+                        </div>
+                        <div className="dropdown ms-3">
+                            <button
+                                className="btn btn-secondary dropdown-toggle"
+                                type="button"
+                                id="dropdownMenuButton"
+                                data-bs-toggle="dropdown"
+                                aria-expanded="false"
+                            >
+                                <i className="bi bi-gear"></i>
+                            </button>
+                            <ul className="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                <li><Link className="dropdown-item" to="/change-profile">Change Profile</Link></li>
+                                <li><Link className="dropdown-item" to="/change-password">Change Password</Link></li>
+                            </ul>
+                        </div>
+                    </div>
                 </div>
-            </div>
-        </nav>
+            </nav>
+
+            {showModal && (
+                <>
+                    <div className="modal-backdrop-blur"></div>
+
+                    <div className="modal show" style={{ display: 'block' }}>
+                        <div className="modal-dialog">
+                            <div className="modal-content">
+                                <div className="modal-header">
+                                    <h5 className="modal-title">Logout Confirmation</h5>
+                                    <button
+                                        type="button"
+                                        className="btn-close"
+                                        onClick={() => setShowModal(false)}
+                                    >
+                                        &times;
+                                    </button>
+                                </div>
+                                <div className="modal-body">
+                                    <p>Are you sure you want to Logout?</p>
+                                </div>
+                                <div className="modal-footer">
+                                    <button
+                                        type="button"
+                                        className="btn btn-secondary"
+                                        onClick={() => setShowModal(false)}
+                                    >
+                                        No
+                                    </button>
+                                    <button
+                                        type="button"
+                                        className="btn btn-danger"
+                                        onClick={handleConfirmLogout}
+                                    >
+                                        Yes
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </>
+            )}
+        </>
     );
 };
 

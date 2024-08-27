@@ -24,8 +24,10 @@ public class OfferController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Optional<Offer>> getSingleOffer(@PathVariable ObjectId id) {
-        return new ResponseEntity<>(offerService.singleOffer(id), HttpStatus.OK);
+    public ResponseEntity<Offer> getSingleOffer(@PathVariable ObjectId id) {
+        Optional<Offer> offer = offerService.singleOffer(id);
+        return offer.map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @PostMapping
@@ -34,17 +36,17 @@ public class OfferController {
         return new ResponseEntity<>(newOffer, HttpStatus.CREATED);
     }
 
-    // Update an existing offer by id
     @PutMapping("/{id}")
     public ResponseEntity<Offer> updateOffer(@PathVariable("id") ObjectId id, @RequestBody Offer offer) {
         Offer updatedOffer = offerService.updateOffer(id, offer);
         return ResponseEntity.ok(updatedOffer);
     }
 
-    // Delete a offer by id
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteOffer(@PathVariable("id") ObjectId id) {
         offerService.deleteOffer(id);
         return ResponseEntity.noContent().build();
     }
+
+
 }

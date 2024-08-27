@@ -48,8 +48,6 @@ const FavoritesPage = () => {
     }
   }, [favoriteProductIds]);
 
-
-  
   useEffect(() => {
     const fetchCartDetails = async () => {
       try {
@@ -67,8 +65,6 @@ const FavoritesPage = () => {
     }
   }, [userId]);
 
-
-
   const handleQuantityChange = (productId, quantity) => {
     if (quantity < 0) return;
 
@@ -85,6 +81,12 @@ const FavoritesPage = () => {
   const handleAddToCart = async (product) => {
     try {
       const quantity = cart[product.productId] || 0;
+
+      
+      if (quantity < 1) {
+        toast.warn('Quantity must be at least 1');
+        return;
+      }
 
       await axios.post('/api/cart/add', null, {
         params: {

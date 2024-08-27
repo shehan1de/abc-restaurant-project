@@ -461,3 +461,6 @@
     display: block;
     color: red;
 }
+.col-form-label {
+    white-space: nowrap;
+}
