@@ -1,6 +1,7 @@
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import '../../CSS/Cart.css'; // Import the CSS file
+import SecFooter from '../footer2';
 import SecNavigation from '../navigation2';
 
 const Purchases = () => {
@@ -61,6 +62,7 @@ const Purchases = () => {
           </div>
         ))}
       </div>
+      <SecFooter/>
     </>
   );
 };

@@ -12,6 +12,6 @@ public class UserRequestDTO {
     private String password;
     private String userEmail;
     private long phoneNumber;
-    private String UserType;
+    private String userType;
     private String profilePicture;
 }

@@ -16,6 +16,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -43,6 +44,8 @@ public class UserService implements UserDetailsService {
         this.jwtUtil = jwtUtil;
         this.emailService = emailService;
     }
+
+
 
     @Override
     public UserDetails loadUserByUsername(String userEmail) throws UsernameNotFoundException {
@@ -165,6 +168,10 @@ public class UserService implements UserDetailsService {
         }
     }
 
+
+
+
+
     public User updateUserProfile(String userId, String username, Long phoneNumber, MultipartFile profilePicture) throws IOException {
         User user = userRepository.findByUserId(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found with id " + userId));
@@ -173,42 +180,42 @@ public class UserService implements UserDetailsService {
         String profilePictureFilename = handleProfilePictureUpload(profilePicture);
 
         // Update user details
-        if (username != null) {
+        if (username != null && !username.isEmpty()) {
             user.setUsername(username);
         }
-        if (phoneNumber != null) {
+        if (phoneNumber != null && phoneNumber > 0) {
             user.setPhoneNumber(phoneNumber);
         }
         if (profilePictureFilename != null) {
             user.setProfilePicture(profilePictureFilename);
         }
 
-        // Save and return updated user
+        // Save and return the updated user
         return userRepository.save(user);
     }
 
 
-    @Value("${upload.path}")
-    private String uploadPath; // Path for file upload, defined in application.properties
-
+    // Define the upload path
+    @Value("${file.upload-dir}")
+    private String uploadDir;
     public String handleProfilePictureUpload(MultipartFile profilePicture) throws IOException {
         if (profilePicture != null && !profilePicture.isEmpty()) {
             String timestamp = new SimpleDateFormat("yyyyMMddHHmmss").format(new Date());
             String originalFilename = profilePicture.getOriginalFilename();
 
-            // Extract file extension
             String fileExtension = "";
             if (originalFilename != null && originalFilename.contains(".")) {
                 fileExtension = originalFilename.substring(originalFilename.lastIndexOf('.'));
             }
 
-            // Construct new filename
             String profilePictureFilename = "propic-" + timestamp + fileExtension;
 
-            // Define the upload path
-            File file = new File(uploadPath, profilePictureFilename);
 
-            // Ensure directory exists
+
+            File file = new File(uploadDir, profilePictureFilename);
+
+
+            // Ensure the directory exists
             file.getParentFile().mkdirs();
 
             // Save the file
@@ -217,5 +224,23 @@ public class UserService implements UserDetailsService {
             return profilePictureFilename;
         }
         return null;
+    }
+
+
+    public boolean verifyCurrentPassword(String userId, String currentPassword) throws ResourceNotFoundException {
+        User user = userRepository.findByUserId(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + userId));
+
+        // Check if the provided current password matches the hashed password in the database
+        return passwordEncoder.matches(currentPassword, user.getPassword());
+    }
+
+    public void updatePassword(String userId, String newPassword) throws ResourceNotFoundException {
+        User user = userRepository.findByUserId(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + userId));
+
+        // Encode the new password and update the user
+        user.setPassword(passwordEncoder.encode(newPassword));
+        userRepository.save(user);
     }
 }

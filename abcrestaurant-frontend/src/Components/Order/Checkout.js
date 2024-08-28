@@ -4,8 +4,8 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
 import '../../CSS/Cart.css';
+import SecFooter from '../footer2';
 import Navigation2 from '../navigation2';
-
 
 const Checkout = () => {
     const [cartItems, setCartItems] = useState([]);
@@ -331,9 +331,13 @@ const Checkout = () => {
           )}
         </div>
       </div>
+
       <button type="button" className="btn btn-primary-submit" onClick={handlePlaceOrder}>
               Place Order to Proceed
-            </button>
+      </button>
+      
+    <SecFooter/>
+
     </>
   );
 };

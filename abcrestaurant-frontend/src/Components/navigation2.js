@@ -1,5 +1,6 @@
+import axios from 'axios';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { jwtDecode } from 'jwt-decode';
+import { jwtDecode } from 'jwt-decode'; // Corrected import
 import React, { useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
@@ -11,7 +12,7 @@ const SecNavigation = () => {
     const navigate = useNavigate();
     const [user, setUser] = useState({
         username: '',
-        email: '',
+        userEmail: '',
         profilePicture: defaultProfilePic
     });
     const [showModal, setShowModal] = useState(false);
@@ -20,13 +21,29 @@ const SecNavigation = () => {
         const token = localStorage.getItem('token');
         if (token) {
             const decoded = jwtDecode(token);
-            setUser({
-                username: decoded.sub,
-                email: decoded.userEmail,
-                profilePicture: decoded.profilePicture ? decoded.profilePicture : defaultProfilePic
-            });
+            fetchUserData(decoded.userId);
         }
     }, []);
+
+    const fetchUserData = async (userId) => {
+        try {
+            const token = localStorage.getItem('token');
+            const response = await axios.get(`/user/${userId}`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+
+            const userData = response.data;
+            setUser({
+                username: userData.username,
+                userEmail: userData.userEmail,
+                profilePicture: userData.profilePicture ? userData.profilePicture : defaultProfilePic
+            });
+        } catch (error) {
+            console.error('Error fetching user data:', error);
+        }
+    };
 
     const handleLogout = () => {
         setShowModal(true);
@@ -86,12 +103,13 @@ const SecNavigation = () => {
                         </ul>
                     </div>
                     <div className="profile-container d-flex align-items-center">
-                        <img src={`/images/${user.profilePicture}`} alt="Profile" className="profile-pic" />
+                    <img src={`/images/${user.profilePicture}`}alt="Profile" className="profile-pic" />
                         <div className="profile-info ms-2">
                             <span className="username">{user.username}</span>
                             <br />
-                            <span className="email">{user.email}</span>
+                            <span className="email">{user.userEmail}</span>
                         </div>
+                        
                         <div className="dropdown ms-3">
                             <button
                                 className="btn btn-secondary dropdown-toggle"

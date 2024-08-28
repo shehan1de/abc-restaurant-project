@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import '../../CSS/Card.css';
 import CustomToastContainer from '../CustomToastContainer';
+import SecFooter from '../footer2';
 import Navigation2 from '../navigation2';
 
 const FavoritesPage = () => {
@@ -190,6 +191,7 @@ const FavoritesPage = () => {
       )}
 
       <CustomToastContainer />
+      <SecFooter/>
     </>
   );
 };

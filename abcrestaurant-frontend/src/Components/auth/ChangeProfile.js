@@ -1,34 +1,49 @@
 import axios from 'axios';
-import { jwtDecode } from 'jwt-decode'; // Import jwt-decode to decode the JWT
+import { jwtDecode } from 'jwt-decode';
 import React, { useEffect, useState } from 'react';
+import '../../CSS/Profile.css';
+import SecFooter from '../footer2';
+import SecNavigation from '../navigation2';
 
 const ChangeProfile = () => {
   const [username, setUsername] = useState('');
   const [phoneNumber, setPhoneNumber] = useState('');
   const [profilePicture, setProfilePicture] = useState(null);
+  const [profilePictureUrl, setProfilePictureUrl] = useState('');
   const [message, setMessage] = useState('');
+  const [userId, setUserId] = useState('');
+  const [userEmail, setUserEmail] = useState('');
+
+  const baseImageUrl = 'http://localhost:8080/images/';
+
+  // Fetch user data
+  const fetchUserData = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) throw new Error('Token is missing or expired');
+
+      const decodedToken = jwtDecode(token);
+      const { userId } = decodedToken;
+
+      const response = await axios.get(`/user/${userId}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+      const userData = response.data;
+
+      setUsername(userData.username);
+      setPhoneNumber(userData.phoneNumber);
+      setProfilePictureUrl(userData.profilePicture ? `${baseImageUrl}${userData.profilePicture}` : 'path/to/default/profile/picture.jpg');
+      setUserId(userData.userId);
+      setUserEmail(userData.userEmail);
+    } catch (error) {
+      console.error('Error fetching user data:', error);
+      setMessage('Failed to fetch user data.');
+    }
+  };
 
   useEffect(() => {
-    const fetchUserData = async () => {
-      try {
-        const token = localStorage.getItem('token');
-        if (!token) throw new Error('Token is missing');
-        
-        const decodedToken = jwtDecode(token);
-        const { userId } = decodedToken;
-        
-        // Fetch user data
-        const response = await axios.get(`/user/${userId}`);
-        const userData = response.data;
-        
-        setUsername(userData.username);
-        setPhoneNumber(userData.phoneNumber);
-      } catch (error) {
-        console.error('Error fetching user data:', error);
-        setMessage('Failed to fetch user data.');
-      }
-    };
-
     fetchUserData();
   }, []);
 
@@ -41,18 +56,28 @@ const ChangeProfile = () => {
   };
 
   const handleProfilePictureChange = (event) => {
-    setProfilePicture(event.target.files[0]);
+    const file = event.target.files[0];
+    if (file) {
+      setProfilePicture(file);
+      setProfilePictureUrl(URL.createObjectURL(file));
+    }
   };
 
   const handleSubmit = async (event) => {
     event.preventDefault();
+
+    // Validate form fields
+    if (!username || !phoneNumber) {
+      setMessage('Username and phone number are required.');
+      return;
+    }
 
     const token = localStorage.getItem('token');
     if (!token) {
       setMessage('Token is missing');
       return;
     }
-    
+
     const decodedToken = jwtDecode(token);
     const { userId } = decodedToken;
 
@@ -64,13 +89,23 @@ const ChangeProfile = () => {
     }
 
     try {
-      const response = await axios.put(`/user/profile/${userId}`, formData, {
+      await axios.put(`/user/profile/${userId}`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
-          'Authorization': `Bearer ${token}`, // Add Authorization header
+          'Authorization': `Bearer ${token}`,
         },
       });
-      setMessage('Profile updated successfully!');
+
+      setMessage('Profile Updated Successfully');
+      fetchUserData();
+      setUsername('');
+      setPhoneNumber('');
+      setProfilePicture(null);
+      setProfilePictureUrl('');
+      window.location.reload();
+      setTimeout(() => {
+        setMessage('');
+      }, 1500);
     } catch (error) {
       console.error('Error updating profile:', error);
       setMessage('Failed to update profile.');
@@ -78,45 +113,96 @@ const ChangeProfile = () => {
   };
 
   return (
-    <div className="container mt-4">
-      <h2>Change Profile</h2>
-      {message && <div className="alert alert-info">{message}</div>}
-      <form onSubmit={handleSubmit}>
-        <div className="mb-3">
-          <label htmlFor="username" className="form-label">Username</label>
-          <input
-            type="text"
-            className="form-control"
-            id="username"
-            value={username}
-            onChange={handleUsernameChange}
-            required
-          />
-        </div>
-        <div className="mb-3">
-          <label htmlFor="phoneNumber" className="form-label">Phone Number</label>
-          <input
-            type="tel"
-            className="form-control"
-            id="phoneNumber"
-            value={phoneNumber}
-            onChange={handlePhoneNumberChange}
-            required
-          />
-        </div>
-        <div className="mb-3">
-          <label htmlFor="profilePicture" className="form-label">Profile Picture</label>
-          <input
-            type="file"
-            className="form-control"
-            id="profilePicture"
-            accept="image/*"
-            onChange={handleProfilePictureChange}
-          />
-        </div>
-        <button type="submit" className="btn btn-primary">Update Profile</button>
-      </form>
-    </div>
+    <>
+      <SecNavigation />
+      <h1 className="form-head-one">
+        <span>Change Profile</span>
+      </h1>
+      <div className="change-profile-container">
+        {message && <div className="alert alert-info">{message}</div>}
+        <form onSubmit={handleSubmit}>
+          <div className="mb-3 row">
+            <div className="col-md-4">
+              <div className="profile-picture-section">
+                <img
+                  src={profilePictureUrl || 'path/to/default/profile/picture.jpg'}
+                  alt="Profile"
+                  className="img-thumbnail"
+                />
+                <div>
+                  <label className="file-input-button">
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleProfilePictureChange}
+                    />
+                    Select Profile Picture
+                  </label>
+                </div>
+              </div>
+            </div>
+            <div className="col-md-8">
+              <div className="mb-3 row">
+                <label htmlFor="userId" className="col-sm-4 col-form-label">User ID</label>
+                <div className="col-sm-8">
+                  <input
+                    type="text"
+                    className="form-control"
+                    id="userId"
+                    value={userId}
+                    readOnly
+                  />
+                </div>
+              </div>
+              <div className="mb-3 row">
+                <label htmlFor="userEmail" className="col-sm-4 col-form-label">Email</label>
+                <div className="col-sm-8">
+                  <input
+                    type="email"
+                    className="form-control"
+                    id="userEmail"
+                    value={userEmail}
+                    readOnly
+                  />
+                </div>
+              </div>
+              <div className="mb-3 row">
+                <label htmlFor="username" className="col-sm-4 col-form-label">Username *</label>
+                <div className="col-sm-8">
+                  <input
+                    type="text"
+                    className={`form-control ${message.includes('required') ? 'is-invalid' : ''}`}
+                    id="username"
+                    value={username}
+                    onChange={handleUsernameChange}
+                    placeholder="Enter your Username"
+                    required
+                  />
+                  {message.includes('required') && <div className="invalid-feedback">{message}</div>}
+                </div>
+              </div>
+              <div className="mb-3 row">
+                <label htmlFor="phoneNumber" className="col-sm-4 col-form-label">Phone Number *</label>
+                <div className="col-sm-8">
+                  <input
+                    type="tel"
+                    className={`form-control ${message.includes('required') ? 'is-invalid' : ''}`}
+                    id="phoneNumber"
+                    value={phoneNumber}
+                    onChange={handlePhoneNumberChange}
+                    placeholder="Enter your Phone Number"
+                    required
+                  />
+                  {message.includes('required') && <div className="invalid-feedback">{message}</div>}
+                </div>
+              </div>
+            </div>
+          </div>
+          <button type="submit" className="btn btn-primary-submit">Update Profile</button>
+        </form>
+      </div>
+      <SecFooter/>
+    </>
   );
 };
 

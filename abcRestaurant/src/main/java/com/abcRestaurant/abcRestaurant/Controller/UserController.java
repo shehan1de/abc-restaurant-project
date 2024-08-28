@@ -2,7 +2,9 @@ package com.abcRestaurant.abcRestaurant.Controller;
 
 import com.abcRestaurant.abcRestaurant.DTO.AuthRequestDTO;
 import com.abcRestaurant.abcRestaurant.DTO.AuthResponseDTO;
+import com.abcRestaurant.abcRestaurant.DTO.PasswordChangeRequest;
 import com.abcRestaurant.abcRestaurant.DTO.UserRequestDTO;
+import com.abcRestaurant.abcRestaurant.Exception.ResourceNotFoundException;
 import com.abcRestaurant.abcRestaurant.Model.User;
 import com.abcRestaurant.abcRestaurant.Service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -70,7 +72,6 @@ public class UserController {
 
         Map<String, Object> response = new HashMap<>();
         try {
-            // Delegate to service
             User updatedUser = userService.updateUserProfile(userId, username, phoneNumber, profilePicture);
 
             response.put("status", "success");
@@ -78,9 +79,45 @@ public class UserController {
             return ResponseEntity.ok(response);
 
         } catch (IOException e) {
-            e.printStackTrace(); // Print the stack trace to understand the issue
+            e.printStackTrace();
             response.put("status", "error");
             response.put("message", "File upload failed.");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+
+        } catch (ResourceNotFoundException e) {
+            response.put("status", "error");
+            response.put("message", e.getMessage());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+        }
+    }
+
+
+    @PostMapping("/verify-and-change-password")
+    public ResponseEntity<Map<String, Object>> verifyAndChangePassword(
+            @RequestBody PasswordChangeRequest passwordChangeRequest,
+            @RequestHeader("Authorization") String token) {
+
+        Map<String, Object> response = new HashMap<>();
+        try {
+            String userId = passwordChangeRequest.getUserId(); // Get userId directly from request
+
+            boolean isPasswordValid = userService.verifyCurrentPassword(userId, passwordChangeRequest.getCurrentPassword());
+
+            if (!isPasswordValid) {
+                response.put("status", "error");
+                response.put("message", "Current password is incorrect.");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+            }
+
+            userService.updatePassword(userId, passwordChangeRequest.getNewPassword());
+
+            response.put("status", "success");
+            return ResponseEntity.ok(response);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            response.put("status", "error");
+            response.put("message", "An error occurred.");
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
     }

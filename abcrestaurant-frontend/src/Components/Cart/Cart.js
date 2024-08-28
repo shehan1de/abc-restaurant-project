@@ -3,6 +3,7 @@ import { jwtDecode } from 'jwt-decode';
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom'; // Import useNavigate
 import '../../CSS/Cart.css';
+import SecFooter from '../footer2';
 import Navigation2 from '../navigation2';
 
 const Cart = () => {
@@ -209,6 +210,7 @@ const Cart = () => {
           </div>
         </>
       )}
+      <SecFooter/>
     </>
   );
 };

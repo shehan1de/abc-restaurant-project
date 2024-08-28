@@ -1,6 +1,7 @@
 import React from 'react';
 import { Route, BrowserRouter as Router, Routes } from 'react-router-dom';
 import AboutABC from './Components/AboutABC';
+import ChangePassword from './Components/auth/ChangePassword';
 import ChangeProfile from './Components/auth/ChangeProfile';
 import ForgetPw1 from './Components/auth/ForgetPw1';
 import ForgetPw2 from './Components/auth/ForgetPw2';
@@ -49,6 +50,7 @@ function App() {
         <Route path="/checkout" element={<ProtectedRoute element={Checkout} allowedRoles={['Customer']} />} />
         <Route path="/purchases" element={<ProtectedRoute element={Purchases} allowedRoles={['Customer']} />} />
         <Route path="/change-profile" element={<ProtectedRoute element={ChangeProfile} allowedRoles={['Customer']} />} />
+        <Route path="/change-password" element={<ProtectedRoute element={ChangePassword} allowedRoles={['Customer']} />} />
       </Routes>
     </Router>
   );
