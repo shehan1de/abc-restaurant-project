@@ -1,6 +1,8 @@
 package com.abcRestaurant.abcRestaurant.Service;
 
 import com.abcRestaurant.abcRestaurant.Model.Order;
+import com.abcRestaurant.abcRestaurant.Model.Product;
+import com.abcRestaurant.abcRestaurant.Model.Reservation;
 import com.abcRestaurant.abcRestaurant.Repository.OrderRepository;
 import com.abcRestaurant.abcRestaurant.Exception.ResourceNotFoundException;
 import org.bson.types.ObjectId;
@@ -16,6 +18,9 @@ public class OrderService {
     @Autowired
     private OrderRepository orderRepository;
 
+    @Autowired
+    OrderRepository productRepository;
+
     // Get all Orders
     public List<Order> allOrders() {
         return orderRepository.findAll();
@@ -26,9 +31,11 @@ public class OrderService {
         return orderRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Order not found with id " + id));
     }
+
     public List<Order> findOrdersByUserId(String userId) {
         return orderRepository.findByUserId(userId);
     }
+
     // Add a new order
     public Order addOrder(Order order) {
         // Generate and set orderId
@@ -61,4 +68,17 @@ public class OrderService {
         long count = orderRepository.count();
         return String.format("order-%03d", count + 1);
     }
+
+    public Order updateOrderStatus(String orderId, String orderStatus) {
+        Order order = orderRepository.findByOrderId(orderId)
+                .orElseThrow(() -> new ResourceNotFoundException("Order not found with id " + orderId));
+
+        order.setOrderStatus(orderStatus);
+        return orderRepository.save(order);
+    }
 }
+
+
+
+
+

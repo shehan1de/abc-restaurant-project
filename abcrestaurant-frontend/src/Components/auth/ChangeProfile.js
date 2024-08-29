@@ -4,6 +4,8 @@ import React, { useEffect, useState } from 'react';
 import '../../CSS/Profile.css';
 import SecFooter from '../footer2';
 import SecNavigation from '../navigation2';
+import TrdNavigation from '../navigation3';
+import FrtNavigation from '../navigation4';
 
 const ChangeProfile = () => {
   const [username, setUsername] = useState('');
@@ -13,17 +15,19 @@ const ChangeProfile = () => {
   const [message, setMessage] = useState('');
   const [userId, setUserId] = useState('');
   const [userEmail, setUserEmail] = useState('');
+  const [userType, setUserType] = useState('');
 
   const baseImageUrl = 'http://localhost:8080/images/';
 
-  // Fetch user data
+
   const fetchUserData = async () => {
     try {
       const token = localStorage.getItem('token');
       if (!token) throw new Error('Token is missing or expired');
 
       const decodedToken = jwtDecode(token);
-      const { userId } = decodedToken;
+      const { userId, userType } = decodedToken;
+      setUserType(userType);
 
       const response = await axios.get(`/user/${userId}`, {
         headers: {
@@ -66,7 +70,6 @@ const ChangeProfile = () => {
   const handleSubmit = async (event) => {
     event.preventDefault();
 
-    // Validate form fields
     if (!username || !phoneNumber) {
       setMessage('Username and phone number are required.');
       return;
@@ -112,9 +115,22 @@ const ChangeProfile = () => {
     }
   };
 
+  const renderNavigation = () => {
+    switch (userType) {
+      case 'Customer':
+        return <SecNavigation />;
+      case 'Staff':
+        return <TrdNavigation />;
+      case 'Admin':
+        return <FrtNavigation />;
+      default:
+        return null;
+    }
+  };
+
   return (
     <>
-      <SecNavigation />
+      {renderNavigation()}
       <h1 className="form-head-one">
         <span>Change Profile</span>
       </h1>

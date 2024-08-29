@@ -1,7 +1,6 @@
 package com.abcRestaurant.abcRestaurant.Service;
 
 import com.abcRestaurant.abcRestaurant.Exception.ResourceNotFoundException;
-import com.abcRestaurant.abcRestaurant.Model.Product;
 import com.abcRestaurant.abcRestaurant.Model.Reservation;
 import com.abcRestaurant.abcRestaurant.Repository.ReservationRepository;
 import org.bson.types.ObjectId;
@@ -21,9 +20,9 @@ public class ReservationService {
         return reservationRepository.findAll();
     }
 
-    // Get a single reservation by id
-    public Optional<Reservation> singleReservation(ObjectId id) {
-        return reservationRepository.findById(id);
+    // Get a single reservation by reservationId
+    public Optional<Reservation> singleReservation(String reservationId) {
+        return reservationRepository.findByReservationId(reservationId);
     }
 
     // Add a new reservation
@@ -38,22 +37,13 @@ public class ReservationService {
         return String.format("res-%03d", count + 1);
     }
 
+    public Reservation updateReservationStatus(String reservationId, String status) {
+        Reservation reservation = reservationRepository.findByReservationId(reservationId)
+                .orElseThrow(() -> new ResourceNotFoundException("Reservation not found with id " + reservationId));
 
-    // Update an existing reservation by id
-    public Reservation updateReservation(ObjectId id, Reservation reservation) {
-        if (!reservationRepository.existsById(id)) {
-            throw new ResourceNotFoundException("Reservation not found with id " + id);
-        }
-        // Ensure the ID in the request body matches the ID in the URL
-        reservation.setId(id);
+        reservation.setStatus(status);
         return reservationRepository.save(reservation);
     }
 
-    // Delete a reservation by id
-    public void deleteReservation(ObjectId id) {
-        if (!reservationRepository.existsById(id)) {
-            throw new ResourceNotFoundException("Reservation not found with id " + id);
-        }
-        reservationRepository.deleteById(id);
-    }
+
 }

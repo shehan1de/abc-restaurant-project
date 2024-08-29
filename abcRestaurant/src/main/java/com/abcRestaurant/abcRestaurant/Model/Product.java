@@ -22,5 +22,4 @@ public class Product {
     private String productImage;
     private String productDescription;
 
-
 }

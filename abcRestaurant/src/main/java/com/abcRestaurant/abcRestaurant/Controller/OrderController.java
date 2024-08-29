@@ -1,6 +1,8 @@
 package com.abcRestaurant.abcRestaurant.Controller;
 
 import com.abcRestaurant.abcRestaurant.Model.Order;
+import com.abcRestaurant.abcRestaurant.Model.Product;
+import com.abcRestaurant.abcRestaurant.Service.ConfirmOrdEmailService;
 import com.abcRestaurant.abcRestaurant.Service.OrderService;
 import com.abcRestaurant.abcRestaurant.Service.OrderEmailService;
 import org.bson.types.ObjectId;
@@ -15,11 +17,17 @@ import java.util.List;
 @RequestMapping("/orders")
 public class OrderController {
 
-    @Autowired
-    private OrderService orderService;
+    private final OrderService orderService;
+    private final OrderEmailService orderEmailService;
+    private final ConfirmOrdEmailService confirmOrdEmailService;
 
     @Autowired
-    private OrderEmailService orderEmailService;
+    public OrderController(OrderService orderService, OrderEmailService orderEmailService, ConfirmOrdEmailService confirmOrdEmailService) {
+        this.orderService = orderService;
+        this.orderEmailService = orderEmailService;
+        this.confirmOrdEmailService = confirmOrdEmailService;
+    }
+
 
     @GetMapping
     public ResponseEntity<List<Order>> getAllOrders() {
@@ -31,7 +39,6 @@ public class OrderController {
         List<Order> orders = orderService.findOrdersByUserId(userId);
         return new ResponseEntity<>(orders, HttpStatus.OK);
     }
-
 
     @PostMapping
     public ResponseEntity<Order> addOrder(@RequestBody Order order) {
@@ -70,4 +77,32 @@ public class OrderController {
         orderService.deleteOrder(id);
         return ResponseEntity.noContent().build();
     }
+
+    @PutMapping("/{orderId}/status")
+    public ResponseEntity<Order> updateOrderStatus(
+            @PathVariable String orderId,
+            @RequestParam String orderStatus) {
+        try {
+            Order updatedOrder = orderService.updateOrderStatus(orderId, orderStatus);
+
+            if (updatedOrder == null) {
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            }
+
+            // Send email notification after updating order status
+            confirmOrdEmailService.sendOrderConfirmation(
+                    updatedOrder.getUserEmail(),
+                    orderId,
+                    updatedOrder.getFinalAmount(),
+                    orderStatus
+            );
+
+            return ResponseEntity.ok(updatedOrder);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+
 }

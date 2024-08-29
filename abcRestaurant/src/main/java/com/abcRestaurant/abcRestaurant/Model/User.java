@@ -28,6 +28,7 @@ public class User {
     private String userType;
     private String verificationCode;
     private LocalDateTime verificationCodeExpiry;
+    private String branch;
 
 
     public void updateProfile(String username, Long phoneNumber, String profilePicture) {

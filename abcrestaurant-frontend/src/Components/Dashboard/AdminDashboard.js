@@ -1,11 +1,11 @@
 import React from 'react';
-import Navigation from '../navigation';
+import FrtNavigation from '../navigation4';
 
 const AdminDashboard = () => {
     return (
         <div>
             <h1>Admin Dashboard</h1>
-            <Navigation/>
+            <FrtNavigation/>
         </div>
     );
 };

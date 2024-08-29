@@ -59,3 +59,75 @@
   color: #484f54;
   cursor: not-allowed;
 }
+
+
+
+
+
+
+
+
+
+.custom-table {
+  width: 100%;
+  background-color: transparent;
+  margin-right: 20px;
+  margin-top: 50px;
+  border-radius: 10px;
+  animation: fadeInUp 1s ease-in-out;
+}
+
+.custom-table th,
+.custom-table td {
+  border: 0.15px solid #a6900357;
+  padding: 10px;
+  color: white;
+  text-align: center;
+  padding-top: 20px;
+  padding-bottom: 20px;
+}
+
+.custom-table th {
+  font-weight: bold;
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.btn-confirm {
+  background-color: #A69003;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  cursor: pointer;
+  border-radius: 5px;
+  font-size: 14px;
+  transition: background-color 0.3s ease;
+}
+
+.btn-deny {
+  background-color: red;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  cursor: pointer;
+  border-radius: 5px;
+  font-size: 14px;
+  transition: background-color 0.3s ease;
+  margin-left: 10px;
+  margin-top: 10px;
+}
+
+.btn-deny:hover {
+  background-color: darkred;
+}
+
+.btn-confirm:hover {
+  background-color: #5f5201;
+}
+
+.sub-par{
+  color: white;
+  text-align: left;
+  margin-bottom: -30px;
+}
+
+

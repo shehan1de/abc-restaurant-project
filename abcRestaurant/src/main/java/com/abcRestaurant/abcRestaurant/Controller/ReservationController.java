@@ -1,6 +1,7 @@
 package com.abcRestaurant.abcRestaurant.Controller;
 
 import com.abcRestaurant.abcRestaurant.Model.Reservation;
+import com.abcRestaurant.abcRestaurant.Service.ConfirmResEmailService;
 import com.abcRestaurant.abcRestaurant.Service.EmailService;
 import com.abcRestaurant.abcRestaurant.Service.ReservationService;
 import org.bson.types.ObjectId;
@@ -21,15 +22,18 @@ public class ReservationController {
 
     @Autowired
     private EmailService emailService;
+    @Autowired
+    private ConfirmResEmailService confirmResEmailService;
+
 
     @GetMapping
     public ResponseEntity<List<Reservation>> getAllReservations() {
         return new ResponseEntity<>(reservationService.allReservations(), HttpStatus.OK);
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<Optional<Reservation>> getSingleReservation(@PathVariable ObjectId id) {
-        return new ResponseEntity<>(reservationService.singleReservation(id), HttpStatus.OK);
+    @GetMapping("/{reservationId}")
+    public ResponseEntity<Optional<Reservation>> getSingleReservation(@PathVariable String reservationId) {
+        return new ResponseEntity<>(reservationService.singleReservation(reservationId), HttpStatus.OK);
     }
 
     @PostMapping
@@ -50,15 +54,26 @@ public class ReservationController {
         return new ResponseEntity<>(newReservation, HttpStatus.CREATED);
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<Reservation> updateReservation(@PathVariable("id") ObjectId id, @RequestBody Reservation reservation) {
-        Reservation updatedReservation = reservationService.updateReservation(id, reservation);
-        return ResponseEntity.ok(updatedReservation);
+    @PutMapping("/{reservationId}/status")
+    public ResponseEntity<Reservation> updateReservationStatus(@PathVariable String reservationId, @RequestParam String status) {
+        try {
+            Reservation updatedReservation = reservationService.updateReservationStatus(reservationId, status);
+            // Send email notification after updating reservation status
+            confirmResEmailService.sendStatusUpdateEmail(
+                    updatedReservation.getEmail(),
+                    reservationId,
+                    status,
+                    updatedReservation.getDate(),
+                    updatedReservation.getTime(),
+                    updatedReservation.getBranch()
+            );
+            return ResponseEntity.ok(updatedReservation);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteReservation(@PathVariable("id") ObjectId id) {
-        reservationService.deleteReservation(id);
-        return ResponseEntity.noContent().build();
-    }
+
+
+
 }

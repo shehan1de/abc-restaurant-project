@@ -13,9 +13,11 @@ import Contact from './Components/Contact';
 import AdminDashboard from './Components/Dashboard/AdminDashboard';
 import CustomerDashboard from './Components/Dashboard/CustomerDashboard';
 import StaffDashboard from './Components/Dashboard/StaffDashboard';
+import FeedbackResponse from './Components/Feedback';
 import Gallery from './Components/Gallery';
 import Index from './Components/Index';
 import Checkout from './Components/Order/Checkout';
+import OrderStaff from './Components/Order/OrderStaff';
 import Purchases from './Components/Order/Purchases';
 import Favorites from './Components/Product/Favorites';
 import Menu from './Components/Product/Menu';
@@ -49,8 +51,10 @@ function App() {
         <Route path="/cart" element={<ProtectedRoute element={Cart} allowedRoles={['Customer']} />} />
         <Route path="/checkout" element={<ProtectedRoute element={Checkout} allowedRoles={['Customer']} />} />
         <Route path="/purchases" element={<ProtectedRoute element={Purchases} allowedRoles={['Customer']} />} />
-        <Route path="/change-profile" element={<ProtectedRoute element={ChangeProfile} allowedRoles={['Customer']} />} />
-        <Route path="/change-password" element={<ProtectedRoute element={ChangePassword} allowedRoles={['Customer']} />} />
+        <Route path="/change-profile" element={<ProtectedRoute element={ChangeProfile} allowedRoles={['Customer','Staff']} />} />
+        <Route path="/change-password" element={<ProtectedRoute element={ChangePassword} allowedRoles={['Customer','Staff']} />} />
+        <Route path="/order-staff" element={<ProtectedRoute element={OrderStaff} allowedRoles={['Staff']} />} />
+        <Route path="/feedback-response" element={<ProtectedRoute element={FeedbackResponse} allowedRoles={['Staff']} />} />
       </Routes>
     </Router>
   );
