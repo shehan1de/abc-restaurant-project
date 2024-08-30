@@ -12,9 +12,7 @@ public interface UserRepository extends MongoRepository<User, String> {
     Optional<User> findByVerificationCode(String code);
     List<User> findByVerificationCodeExpiryBefore(LocalDateTime expiryDate);
     Optional<User> findByUserId(String userId);
-
     boolean existsByUserId(String userId);
-
     void deleteByUserId(String userId);
 
 }

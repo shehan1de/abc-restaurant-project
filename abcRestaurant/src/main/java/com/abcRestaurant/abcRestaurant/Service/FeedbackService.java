@@ -15,6 +15,9 @@ public class FeedbackService {
     @Autowired
     private FeedbackRepository feedbackRepository;
 
+    @Autowired
+    private FeedResEmailService feedResEmailService;
+
     // Get all feedbacks
     public List<Feedback> allFeedbacks() {
         return feedbackRepository.findAll();
@@ -60,4 +63,24 @@ public class FeedbackService {
         }
         feedbackRepository.deleteById(id);
     }
+    public Feedback updateFeedbackResponseByFeedbackId(String feedbackId, String staffResponse) {
+        Feedback feedback = feedbackRepository.findByFeedbackId(feedbackId)
+                .orElseThrow(() -> new ResourceNotFoundException("Feedback not found with feedbackId " + feedbackId));
+
+        String userMessage = feedback.getMessage(); // Retrieve the user's original message
+
+        feedback.setStaffResponse(staffResponse);
+        Feedback updatedFeedback = feedbackRepository.save(feedback);
+
+        // Send email with the staff response and user's original message
+        feedResEmailService.sendFeedbackResponseEmail(
+                feedback.getEmail(),
+                feedback.getName(),
+                staffResponse,
+                userMessage
+        );
+
+        return updatedFeedback;
+    }
+
 }

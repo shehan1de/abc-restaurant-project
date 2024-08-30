@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @RestController
@@ -47,5 +48,15 @@ public class FeedbackController {
     public ResponseEntity<Void> deleteFeedback(@PathVariable("id") ObjectId id) {
         feedbackService.deleteFeedback(id);
         return ResponseEntity.noContent().build();
+    }
+
+    // Update feedback response by feedbackId
+    @PatchMapping("/{feedbackId}/response")
+    public ResponseEntity<Feedback> updateFeedbackResponse(
+            @PathVariable("feedbackId") String feedbackId,
+            @RequestBody Map<String, String> requestBody) {
+        String response = requestBody.get("response");
+        Feedback updatedFeedback = feedbackService.updateFeedbackResponseByFeedbackId(feedbackId, response);
+        return ResponseEntity.ok(updatedFeedback);
     }
 }

@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import '../CSS/Form.css';
 import Footer from './footer';
-import Navigation from './navigation';
+import Navigation from './Navigations/navigation';
 
 const Contact = () => {
     const [branches, setBranches] = useState([]);

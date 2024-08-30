@@ -4,8 +4,8 @@ import { jwtDecode } from 'jwt-decode'; // Corrected import
 import React, { useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
-import '../CSS/Navigation2.css';
-import defaultProfilePic from '../Image/logo.png';
+import '../../CSS/Navigation2.css';
+import defaultProfilePic from '../../Image/logo.png';
 
 const SecNavigation = () => {
     const location = useLocation();
@@ -72,6 +72,7 @@ const SecNavigation = () => {
             });
         }, 0);
     };
+   
 
     return (
         <>

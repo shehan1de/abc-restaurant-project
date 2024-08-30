@@ -4,7 +4,7 @@ import { Link, useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 import '../../CSS/Form.css';
 import Footer from "../footer";
-import Navigation from "../navigation";
+import Navigation from "../Navigations/navigation";
 
 const Register = () => {
     const [register, setRegister] = useState({

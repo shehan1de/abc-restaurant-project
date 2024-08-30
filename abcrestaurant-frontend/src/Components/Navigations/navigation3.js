@@ -4,10 +4,10 @@ import { jwtDecode } from 'jwt-decode';
 import React, { useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
-import '../CSS/Navigation2.css';
-import defaultProfilePic from '../Image/logo.png';
+import '../../CSS/Navigation2.css';
+import defaultProfilePic from '../../Image/logo.png';
 
-const FrtNavigation = () => {
+const TrdNavigation = () => {
     const location = useLocation();
     const navigate = useNavigate();
     const [user, setUser] = useState({
@@ -86,16 +86,13 @@ const FrtNavigation = () => {
                     <div className="collapse navbar-collapse flex-grow-1 justify-content-center" id="navbarNavDropdown">
                         <ul className="navbar-nav">
                             <li className="nav-item">
-                                <Link className={`nav-link ${location.pathname === '/staff-dashboard' ? 'active' : ''}`} to="/staff-dashboard">Home</Link>
+                                <Link className={`nav-link ${location.pathname === '/staff-dashboard' ? 'active' : ''}`} to="/staff-dashboard">Resrvation</Link>
                             </li>
                             <li className="nav-item">
-                                <Link className={`nav-link ${location.pathname === '/' ? 'active' : ''}`} to="/">Favorites</Link>
+                                <Link className={`nav-link ${location.pathname === '/order-staff' ? 'active' : ''}`} to="/order-staff">Orders</Link>
                             </li>
                             <li className="nav-item">
-                                <Link className={`nav-link ${location.pathname === '/' ? 'active' : ''}`} to="/">Cart</Link>
-                            </li>
-                            <li className="nav-item">
-                                <Link className={`nav-link ${location.pathname === '/' ? 'active' : ''}`} to="/">Purchases</Link>
+                                <Link className={`nav-link ${location.pathname === '/feedback-response' ? 'active' : ''}`} to="/feedback-response">Feedbacks</Link>
                             </li>
                             <li className="nav-item">
                                 <button className="btn btn-gold nav-link" onClick={handleLogout}>Logout</button>
@@ -174,4 +171,4 @@ const FrtNavigation = () => {
     );
 };
 
-export default FrtNavigation;
+export default TrdNavigation;

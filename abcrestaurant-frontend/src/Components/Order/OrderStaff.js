@@ -3,7 +3,7 @@ import { jwtDecode } from 'jwt-decode'; // Fixed import for jwt-decode
 import React, { useEffect, useState } from 'react';
 import '../../CSS/Profile.css';
 import SecFooter from '../footer2';
-import TrdNavigation from '../navigation3';
+import TrdNavigation from '../Navigations/navigation3';
 
 const OrderStaff = () => {
   const [orders, setOrders] = useState([]);

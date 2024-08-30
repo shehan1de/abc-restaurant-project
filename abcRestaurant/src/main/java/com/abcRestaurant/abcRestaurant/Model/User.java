@@ -1,5 +1,6 @@
 package com.abcRestaurant.abcRestaurant.Model;
 
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -23,7 +24,7 @@ public class User {
     private String username;
     private String password;
     private String userEmail;
-    private long phoneNumber;
+    private Long phoneNumber;
     private String profilePicture;
     private String userType;
     private String verificationCode;
@@ -42,5 +43,6 @@ public class User {
             this.profilePicture = profilePicture;
         }
     }
+
 }
 

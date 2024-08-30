@@ -21,4 +21,5 @@ public class Feedback {
     private long phoneNumber;
     private String subject;
     private String message;
+    private String staffResponse;
 }

@@ -35,11 +35,17 @@ public class UserController {
     public ResponseEntity<Optional<User>> getSingleUser(@PathVariable String userId) {
         return new ResponseEntity<>(userService.singleUser(userId), HttpStatus.OK);
     }
-
+    
     @PostMapping("/register")
     public ResponseEntity<User> registerUser(@RequestBody UserRequestDTO userRequestDTO) {
         User newUser = userService.addUser(userRequestDTO);
         return new ResponseEntity<>(newUser, HttpStatus.CREATED);
+    }
+
+    @PostMapping("/userAdd")
+    public ResponseEntity<User> userAdd(@RequestBody User user) {
+        User newUser = userService.userAdd(user);
+        return new ResponseEntity<>(newUser,HttpStatus.CREATED);
     }
 
     @PostMapping("/login")
@@ -68,11 +74,15 @@ public class UserController {
             @PathVariable("userId") String userId,
             @RequestParam(required = false) String username,
             @RequestParam(required = false) Long phoneNumber,
-            @RequestParam(value = "profilePicture", required = false) MultipartFile profilePicture) {
+            @RequestParam(required = false) String userEmail,
+            @RequestParam(required = false) String userType,
+            @RequestParam(required = false) String branch,
+            @RequestParam(value = "profilePicture", required = false) MultipartFile profilePicture)
+    {
 
         Map<String, Object> response = new HashMap<>();
         try {
-            User updatedUser = userService.updateUserProfile(userId, username, phoneNumber, profilePicture);
+            User updatedUser = userService.updateUserProfile(userId, username, phoneNumber, profilePicture,userEmail,userType,branch);
 
             response.put("status", "success");
             response.put("user", updatedUser);
@@ -121,4 +131,8 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
     }
+
+
+
+
 }

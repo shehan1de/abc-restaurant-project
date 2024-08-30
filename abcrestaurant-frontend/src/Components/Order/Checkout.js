@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
 import '../../CSS/Cart.css';
 import SecFooter from '../footer2';
-import Navigation2 from '../navigation2';
+import Navigation2 from '../Navigations/navigation2';
 
 const Checkout = () => {
     const [cartItems, setCartItems] = useState([]);

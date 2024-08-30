@@ -5,7 +5,7 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import '../../CSS/Card.css';
 import SecFooter from '../footer2';
-import Navigation2 from '../navigation2';
+import Navigation2 from '../Navigations/navigation2';
 
 const ProductView = () => {
     const { categoryName, productId } = useParams();

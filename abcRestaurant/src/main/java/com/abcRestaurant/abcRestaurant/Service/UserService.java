@@ -16,7 +16,6 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -76,11 +75,43 @@ public class UserService implements UserDetailsService {
 
         return userRepository.save(user);
     }
+    public User userAdd(User user){
+
+        user.setUserId(generateUserId());
+        user.setUsername(user.getUsername());
+        user.setUserEmail(user.getUserEmail());
+        user.setPhoneNumber(user.getPhoneNumber());
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        user.setUserType(user.getUserType());
+        if ("Staff".equals(user.getUserType())) {
+            user.setBranch(user.getBranch());
+        }
+
+
+        String profilePicture = user.getProfilePicture();
+        user.setProfilePicture(profilePicture != null && !profilePicture.isEmpty() ? profilePicture : "default.jpg");
+
+        return userRepository.save(user);
+    }
 
     private String generateUserId() {
-        long count = userRepository.count();
-        return String.format("user-%03d", count + 1);
+        List<User> users = userRepository.findAll();
+        int maxId = 0;
+        for (User user : users) {
+            String userId = user.getUserId();
+            try {
+                int numericPart = Integer.parseInt(userId.split("-")[1]);
+                if (numericPart > maxId) {
+                    maxId = numericPart;
+                }
+            } catch (NumberFormatException | ArrayIndexOutOfBoundsException e) {
+                System.err.println("Error parsing userId: " + userId + ". Skipping this entry.");
+            }
+        }
+        int nextId = maxId + 1;
+        return String.format("user-%03d", nextId);
     }
+
 
     public User updateUser(String userId, User user) {
         if (!userRepository.existsByUserId(userId)) {
@@ -172,7 +203,7 @@ public class UserService implements UserDetailsService {
 
 
 
-    public User updateUserProfile(String userId, String username, Long phoneNumber, MultipartFile profilePicture) throws IOException {
+    public User updateUserProfile(String userId, String username, Long phoneNumber, MultipartFile profilePicture,String userEmail, String userType, String branch) throws IOException {
         User user = userRepository.findByUserId(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found with id " + userId));
 
@@ -189,8 +220,18 @@ public class UserService implements UserDetailsService {
         if (profilePictureFilename != null) {
             user.setProfilePicture(profilePictureFilename);
         }
+        if (userEmail != null && !userEmail.isEmpty()) {
+            user.setUserEmail(userEmail);
+        }
+        if (userType != null && !userType.isEmpty()) {
+            user.setUserType(userType);
+        }
+        if (branch != null && !branch.isEmpty()) {
+            user.setBranch(branch);
+        }
 
-        // Save and return the updated user
+
+
         return userRepository.save(user);
     }
 
@@ -207,18 +248,11 @@ public class UserService implements UserDetailsService {
             if (originalFilename != null && originalFilename.contains(".")) {
                 fileExtension = originalFilename.substring(originalFilename.lastIndexOf('.'));
             }
-
             String profilePictureFilename = "propic-" + timestamp + fileExtension;
-
-
-
             File file = new File(uploadDir, profilePictureFilename);
 
-
-            // Ensure the directory exists
             file.getParentFile().mkdirs();
 
-            // Save the file
             profilePicture.transferTo(file);
 
             return profilePictureFilename;
@@ -243,4 +277,9 @@ public class UserService implements UserDetailsService {
         user.setPassword(passwordEncoder.encode(newPassword));
         userRepository.save(user);
     }
+
+
+
+
+
 }

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useLocation, useParams } from 'react-router-dom';
 import Footer from "../Components/footer";
-import Navigation from "../Components/navigation";
+import Navigation from "../Components/Navigations/navigation";
 import '../CSS/Form.css';
 
 const Gallery = () => {

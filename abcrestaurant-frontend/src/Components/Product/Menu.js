@@ -2,7 +2,7 @@ import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import '../../CSS/Menu.css';
 import Footer from '../footer';
-import Navigation from '../navigation';
+import Navigation from '../Navigations/navigation';
 
 const Menu = () => {
     const [categories, setCategories] = useState([]);

@@ -1,11 +1,12 @@
 import axios from 'axios';
 import { jwtDecode } from 'jwt-decode';
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import '../../CSS/Profile.css';
 import SecFooter from '../footer2';
-import SecNavigation from '../navigation2';
-import TrdNavigation from '../navigation3';
-import FrtNavigation from '../navigation4';
+import SecNavigation from '../Navigations/navigation2';
+import TrdNavigation from '../Navigations/navigation3';
+import FrtNavigation from '../Navigations/navigation4';
 
 const ChangeProfile = () => {
   const [username, setUsername] = useState('');
@@ -16,6 +17,7 @@ const ChangeProfile = () => {
   const [userId, setUserId] = useState('');
   const [userEmail, setUserEmail] = useState('');
   const [userType, setUserType] = useState('');
+  const navigate = useNavigate();
 
   const baseImageUrl = 'http://localhost:8080/images/';
 
@@ -131,7 +133,15 @@ const ChangeProfile = () => {
   return (
     <>
       {renderNavigation()}
+      
       <h1 className="form-head-one">
+      {userType === 'Admin' && (
+            <div className="back-arrow">
+              <span className="back-arrow-one" onClick={() => navigate('/admin-dashboard')}>
+                <i className="bi bi-caret-left-fill"></i>
+              </span>
+            </div>
+          )}
         <span>Change Profile</span>
       </h1>
       <div className="change-profile-container">

@@ -1,6 +1,7 @@
 import React from 'react';
 import { Route, BrowserRouter as Router, Routes } from 'react-router-dom';
 import AboutABC from './Components/AboutABC';
+import AddUser from './Components/auth/AddUser';
 import ChangePassword from './Components/auth/ChangePassword';
 import ChangeProfile from './Components/auth/ChangeProfile';
 import ForgetPw1 from './Components/auth/ForgetPw1';
@@ -8,6 +9,7 @@ import ForgetPw2 from './Components/auth/ForgetPw2';
 import Login from './Components/auth/Login';
 import Register from './Components/auth/Register';
 import ResetPw from './Components/auth/ResetPw';
+import ViewBranch from './Components/Branch/ViewBranch';
 import Cart from './Components/Cart/Cart';
 import Contact from './Components/Contact';
 import AdminDashboard from './Components/Dashboard/AdminDashboard';
@@ -51,10 +53,12 @@ function App() {
         <Route path="/cart" element={<ProtectedRoute element={Cart} allowedRoles={['Customer']} />} />
         <Route path="/checkout" element={<ProtectedRoute element={Checkout} allowedRoles={['Customer']} />} />
         <Route path="/purchases" element={<ProtectedRoute element={Purchases} allowedRoles={['Customer']} />} />
-        <Route path="/change-profile" element={<ProtectedRoute element={ChangeProfile} allowedRoles={['Customer','Staff']} />} />
-        <Route path="/change-password" element={<ProtectedRoute element={ChangePassword} allowedRoles={['Customer','Staff']} />} />
+        <Route path="/change-profile" element={<ProtectedRoute element={ChangeProfile} allowedRoles={['Customer','Staff','Admin']} />} />
+        <Route path="/change-password" element={<ProtectedRoute element={ChangePassword} allowedRoles={['Customer','Staff','Admin']} />} />
         <Route path="/order-staff" element={<ProtectedRoute element={OrderStaff} allowedRoles={['Staff']} />} />
         <Route path="/feedback-response" element={<ProtectedRoute element={FeedbackResponse} allowedRoles={['Staff']} />} />
+        <Route path="/add-user" element={<ProtectedRoute element={AddUser} allowedRoles={['Admin']} />} />
+        <Route path="/view-branch" element={<ProtectedRoute element={ViewBranch} allowedRoles={['Admin']} />} />
       </Routes>
     </Router>
   );

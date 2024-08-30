@@ -2,7 +2,7 @@ import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import '../../CSS/Cart.css'; // Import the CSS file
 import SecFooter from '../footer2';
-import SecNavigation from '../navigation2';
+import SecNavigation from '../Navigations/navigation2';
 
 const Purchases = () => {
   const [orders, setOrders] = useState([]);

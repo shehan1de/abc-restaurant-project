@@ -1,12 +1,13 @@
 import axios from 'axios';
 import { jwtDecode } from 'jwt-decode';
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
 import '../../CSS/Form.css';
 import SecFooter from '../footer2';
-import SecNavigation from '../navigation2';
-import TrdNavigation from '../navigation3';
-import FrtNavigation from '../navigation4';
+import SecNavigation from '../Navigations/navigation2';
+import TrdNavigation from '../Navigations/navigation3';
+import FrtNavigation from '../Navigations/navigation4';
 
 const ChangePassword = () => {
   const [currentPassword, setCurrentPassword] = useState('');
@@ -17,6 +18,7 @@ const ChangePassword = () => {
   const [confirmNewPasswordVisible, setConfirmNewPasswordVisible] = useState(false);
   const [loading, setLoading] = useState(false);
   const [userType, setUserType] = useState('');
+  const navigate = useNavigate();
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -136,10 +138,20 @@ const ChangePassword = () => {
       {userType === 'Customer' && <SecNavigation />}
       {userType === 'Staff' && <TrdNavigation />}
       {userType === 'Admin' && <FrtNavigation />}
-      
+
       <div className="email-container">
         <form onSubmit={handleSubmit} className="login-form">
-          <h1 className="form-head">Change Password</h1>
+          
+          
+          <h1 className="form-head">
+          {userType === 'Admin' && (
+            <div className="back-arrow">
+              <span className="back-arrow-one" onClick={() => navigate('/admin-dashboard')}>
+                <i className="bi bi-caret-left-fill"></i>
+              </span>
+            </div>
+          )}
+            Change Password</h1>
           <h2 className="sub-head">
             Enter your current password and a new password for security
           </h2>
@@ -147,7 +159,7 @@ const ChangePassword = () => {
           {loading ? (
             <div
               className="d-flex flex-column justify-content-center align-items-center"
-              style={{ minHeight: '30vh' }}
+              style={{ blockSize: '30vh' }}
             >
               <div className="spinner-border text-primary" role="status">
                 <span className="visually-hidden">Loading...</span>

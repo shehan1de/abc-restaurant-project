@@ -6,7 +6,7 @@ import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import Swal from 'sweetalert2';
 import Footer from '../Components/footer';
-import Navigation from '../Components/navigation';
+import Navigation from '../Components/Navigations/navigation';
 import '../CSS/Home.css';
 
 const Index = () => {

@@ -1,7 +1,7 @@
 import '../CSS/Form.css';
 import aboutImage from '../Image/about.jpg';
 import Footer from './footer';
-import Navigation from "./navigation";
+import Navigation from "./Navigations/navigation";
 
 
 const AboutABC = () => {

@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import '../../CSS/Card.css';
 import SecFooter from '../footer2';
-import Navigation2 from '../navigation2';
+import Navigation2 from '../Navigations/navigation2';
 
 const CustomerDashboard = () => {
     const navigate = useNavigate();
