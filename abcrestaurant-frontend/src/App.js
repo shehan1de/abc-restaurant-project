@@ -9,6 +9,7 @@ import ForgetPw2 from './Components/auth/ForgetPw2';
 import Login from './Components/auth/Login';
 import Register from './Components/auth/Register';
 import ResetPw from './Components/auth/ResetPw';
+import AddBranch from './Components/Branch/AddBranch';
 import ViewBranch from './Components/Branch/ViewBranch';
 import Cart from './Components/Cart/Cart';
 import Contact from './Components/Contact';
@@ -21,11 +22,13 @@ import Index from './Components/Index';
 import Checkout from './Components/Order/Checkout';
 import OrderStaff from './Components/Order/OrderStaff';
 import Purchases from './Components/Order/Purchases';
+import AdminViewProduct from './Components/Product/AdminViewProduct';
 import Favorites from './Components/Product/Favorites';
 import Menu from './Components/Product/Menu';
 import ProductView from './Components/Product/ProductView';
 import ProtectedRoute from './Components/ProtectedRoute';
 import Reservation from './Components/Reservation';
+
 
 function App() {
   return (
@@ -59,6 +62,8 @@ function App() {
         <Route path="/feedback-response" element={<ProtectedRoute element={FeedbackResponse} allowedRoles={['Staff']} />} />
         <Route path="/add-user" element={<ProtectedRoute element={AddUser} allowedRoles={['Admin']} />} />
         <Route path="/view-branch" element={<ProtectedRoute element={ViewBranch} allowedRoles={['Admin']} />} />
+        <Route path="/add-branch" element={<ProtectedRoute element={AddBranch} allowedRoles={['Admin']} />} />
+        <Route path="/view-product" element={<ProtectedRoute element={AdminViewProduct} allowedRoles={['Admin']} />} />
       </Routes>
     </Router>
   );

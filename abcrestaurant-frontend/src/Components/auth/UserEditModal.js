@@ -163,9 +163,6 @@ const UserUpdateModal = ({ show, handleClose, user, onUpdate }) => {
           </div>
         </div>
       </div>
-
-  
-
     </>
   );
 };

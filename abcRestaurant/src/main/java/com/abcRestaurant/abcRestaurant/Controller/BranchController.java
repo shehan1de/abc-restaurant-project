@@ -1,5 +1,6 @@
 package com.abcRestaurant.abcRestaurant.Controller;
 
+import com.abcRestaurant.abcRestaurant.Exception.ResourceNotFoundException;
 import com.abcRestaurant.abcRestaurant.Model.Branch;
 import com.abcRestaurant.abcRestaurant.Service.BranchService;
 import org.bson.types.ObjectId;
@@ -35,17 +36,15 @@ public class BranchController {
         return new ResponseEntity<>(newBranch, HttpStatus.CREATED);
     }
 
-    // Update an existing branch by id
-    @PutMapping("/{id}")
-    public ResponseEntity<Branch> updateBranch(@PathVariable("id") ObjectId id, @RequestBody Branch branch) {
-        Branch updatedBranch = branchService.updateBranch(id, branch);
+    @PutMapping("/{branchId}")
+    public ResponseEntity<Branch> updateBranch(@PathVariable("branchId") String branchId, @RequestBody Branch branch) {
+        Branch updatedBranch = branchService.updateBranch(branchId, branch);
         return ResponseEntity.ok(updatedBranch);
     }
 
-    // Delete a branch by id
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteBranch(@PathVariable("id") ObjectId id) {
-        branchService.deleteBranch(id);
+    @DeleteMapping("/{branchId}")
+    public ResponseEntity<Void> deleteBranch(@PathVariable("branchId") String branchId) {
+        branchService.deleteBranch(branchId);
         return ResponseEntity.noContent().build();
     }
 }

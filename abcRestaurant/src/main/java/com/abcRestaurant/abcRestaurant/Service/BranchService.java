@@ -2,6 +2,7 @@ package com.abcRestaurant.abcRestaurant.Service;
 
 import com.abcRestaurant.abcRestaurant.Model.Branch;
 import com.abcRestaurant.abcRestaurant.Model.Category;
+import com.abcRestaurant.abcRestaurant.Model.User;
 import com.abcRestaurant.abcRestaurant.Repository.BranchRepository;
 import com.abcRestaurant.abcRestaurant.Exception.ResourceNotFoundException;
 import org.bson.types.ObjectId;
@@ -32,27 +33,39 @@ public class BranchService {
         return branchRepository.save(branch);
     }
 
-    // Generate a new branch ID
     private String generateBranchId() {
-        long count = branchRepository.count();
-        return String.format("branch-%03d", count + 1);
+        List<Branch> branches = branchRepository.findAll();
+        int maxId = 0;
+        for (Branch branch : branches) {
+            String branchId = branch.getBranchId();
+            try {
+                int numericPart = Integer.parseInt(branchId.split("-")[1]);
+                if (numericPart > maxId) {
+                    maxId = numericPart;
+                }
+            } catch (NumberFormatException | ArrayIndexOutOfBoundsException e) {
+                System.err.println("Error parsing userId: " + branchId + ". Skipping this entry.");
+            }
+        }
+        int nextId = maxId + 1;
+        return String.format("branch-%03d", nextId);
     }
 
-    // Update an existing branch by id
-    public Branch updateBranch(ObjectId id, Branch branch) {
-        if (!branchRepository.existsById(id)) {
-            throw new ResourceNotFoundException("Branch not found with id " + id);
-        }
-        // Ensure the ID in the request body matches the ID in the URL
-        branch.setId(id);
-        return branchRepository.save(branch);
+
+    public Branch updateBranch(String branchId, Branch branch) {
+        Branch existingBranch = branchRepository.findByBranchId(branchId)
+                .orElseThrow(() -> new ResourceNotFoundException("Branch not found with id " + branchId));
+
+        existingBranch.setBranchName(branch.getBranchName());
+        existingBranch.setBranchAddress(branch.getBranchAddress());
+
+        return branchRepository.save(existingBranch);
     }
 
-    // Delete a branch by id
-    public void deleteBranch(ObjectId id) {
-        if (!branchRepository.existsById(id)) {
-            throw new ResourceNotFoundException("Branch not found with id " + id);
-        }
-        branchRepository.deleteById(id);
+
+    public void deleteBranch(String branchId) {
+        Branch existingBranch = branchRepository.findByBranchId(branchId)
+                .orElseThrow(() -> new ResourceNotFoundException("Branch not found with id " + branchId));
+        branchRepository.delete(existingBranch);
     }
 }
