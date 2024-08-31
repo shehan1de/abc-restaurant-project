@@ -3,12 +3,10 @@ import React, { useEffect, useState } from 'react';
 import { Button, Form } from 'react-bootstrap';
 
 const UpdateBranchModal = ({ show, handleClose, branch, onUpdate }) => {
-  // Initialize state with branch data or empty strings
   const [branchName, setBranchName] = useState(branch?.branchName || '');
   const [branchAddress, setBranchAddress] = useState(branch?.branchAddress || '');
   const [loading, setLoading] = useState(false);
 
-  // Effect to update state when branch data changes
   useEffect(() => {
     if (branch) {
       setBranchName(branch.branchName);
@@ -16,7 +14,6 @@ const UpdateBranchModal = ({ show, handleClose, branch, onUpdate }) => {
     }
   }, [branch]);
 
-  // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -33,13 +30,12 @@ const UpdateBranchModal = ({ show, handleClose, branch, onUpdate }) => {
     setLoading(true);
 
     try {
-      // Use branch.branchId for the update request
       await axios.put(`/branch/${branch.branchId}`, {
         branchName,
         branchAddress,
       });
-      onUpdate(); // Call onUpdate to refresh the branch list
-      handleClose(); // Close the modal
+      onUpdate();
+      handleClose();
     } catch (error) {
       console.error('Error updating branch', error);
       alert('Failed to update branch. Please try again.');

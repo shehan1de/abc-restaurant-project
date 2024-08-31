@@ -22,6 +22,7 @@ import Index from './Components/Index';
 import Checkout from './Components/Order/Checkout';
 import OrderStaff from './Components/Order/OrderStaff';
 import Purchases from './Components/Order/Purchases';
+import AddProduct from './Components/Product/AddProduct';
 import AdminViewProduct from './Components/Product/AdminViewProduct';
 import Favorites from './Components/Product/Favorites';
 import Menu from './Components/Product/Menu';
@@ -64,6 +65,7 @@ function App() {
         <Route path="/view-branch" element={<ProtectedRoute element={ViewBranch} allowedRoles={['Admin']} />} />
         <Route path="/add-branch" element={<ProtectedRoute element={AddBranch} allowedRoles={['Admin']} />} />
         <Route path="/view-product" element={<ProtectedRoute element={AdminViewProduct} allowedRoles={['Admin']} />} />
+        <Route path="/add-product" element={<ProtectedRoute element={AddProduct} allowedRoles={['Admin']} />} />
       </Routes>
     </Router>
   );

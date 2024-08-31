@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
 import '../../CSS/Form.css';
 import TrdNavigation from '../Navigations/navigation4';
+import SecFooter from '../footer2';
 
 const AddBranch = () => {
     const [formData, setFormData] = useState({
@@ -137,6 +138,7 @@ const AddBranch = () => {
                     </form>
                 )}
             </div>
+            <SecFooter/>
         </>
     );
 };

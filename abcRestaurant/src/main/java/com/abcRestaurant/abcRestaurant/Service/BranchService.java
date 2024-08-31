@@ -24,6 +24,7 @@ public class BranchService {
 
     // Get a single branch by id
     public Optional<Branch> singleBranch(ObjectId id) {
+
         return branchRepository.findById(id);
     }
 
@@ -44,7 +45,7 @@ public class BranchService {
                     maxId = numericPart;
                 }
             } catch (NumberFormatException | ArrayIndexOutOfBoundsException e) {
-                System.err.println("Error parsing userId: " + branchId + ". Skipping this entry.");
+                System.err.println("Error parsing branchId: " + branchId + ". Skipping this entry.");
             }
         }
         int nextId = maxId + 1;
