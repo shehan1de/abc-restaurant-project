@@ -24,20 +24,17 @@ const ProductView = () => {
         const fetchData = async () => {
             try {
                 if (categoryName) {
-                    // Fetch products by category
-                    const productResponse = await axios.get(`/product?categoryName=${encodeURIComponent(categoryName)}`);
+                    const productResponse = await axios.get(`/product/byCategory?categoryName=${encodeURIComponent(categoryName)}`);
                     setProducts(productResponse.data);
                 }
 
                 if (productId) {
-                    // Fetch single product details
                     const productResponse = await axios.get(`/product/${productId}`);
                     setProduct(productResponse.data);
                     setQuantity(cart[productId] || 0);
                 }
 
                 if (userId) {
-                    // Fetch cart details
                     const cartResponse = await axios.get(`/api/cart/details?userId=${userId}`);
                     const cartData = cartResponse.data;
                     setCart(cartData.productId || {});

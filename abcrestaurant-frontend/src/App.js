@@ -12,6 +12,8 @@ import ResetPw from './Components/auth/ResetPw';
 import AddBranch from './Components/Branch/AddBranch';
 import ViewBranch from './Components/Branch/ViewBranch';
 import Cart from './Components/Cart/Cart';
+import AddCategory from './Components/Category/AddCategory';
+import ViewCategory from './Components/Category/VIewCategory';
 import Contact from './Components/Contact';
 import AdminDashboard from './Components/Dashboard/AdminDashboard';
 import CustomerDashboard from './Components/Dashboard/CustomerDashboard';
@@ -66,6 +68,8 @@ function App() {
         <Route path="/add-branch" element={<ProtectedRoute element={AddBranch} allowedRoles={['Admin']} />} />
         <Route path="/view-product" element={<ProtectedRoute element={AdminViewProduct} allowedRoles={['Admin']} />} />
         <Route path="/add-product" element={<ProtectedRoute element={AddProduct} allowedRoles={['Admin']} />} />
+        <Route path="/view-category" element={<ProtectedRoute element={ViewCategory} allowedRoles={['Admin']} />} />
+        <Route path="/add-category" element={<ProtectedRoute element={AddCategory} allowedRoles={['Admin']} />} />
       </Routes>
     </Router>
   );

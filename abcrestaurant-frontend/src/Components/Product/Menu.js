@@ -24,7 +24,7 @@ const Menu = () => {
 
     const fetchProductsForCategories = (categories) => {
         categories.forEach(category => {
-            axios.get('/product', {
+            axios.get('/product/byCategory', {
                 params: {
                     categoryName: category.categoryName
                 }

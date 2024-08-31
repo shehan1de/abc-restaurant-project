@@ -1,12 +1,18 @@
 package com.abcRestaurant.abcRestaurant.Service;
 
 import com.abcRestaurant.abcRestaurant.Model.Category;
+import com.abcRestaurant.abcRestaurant.Model.Product;
 import com.abcRestaurant.abcRestaurant.Repository.CategoryRepository;
 import com.abcRestaurant.abcRestaurant.Exception.ResourceNotFoundException;
+import com.abcRestaurant.abcRestaurant.Repository.ProductRepository;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -14,6 +20,12 @@ import java.util.Optional;
 public class CategoryService {
     @Autowired
     private CategoryRepository categoryRepository;
+
+    @Autowired
+    private FileStorageService fileStorageService;
+
+    @Autowired
+    private ProductRepository productRepository;
 
     // Get all categories
     public List<Category> allCategory() {
@@ -31,28 +43,70 @@ public class CategoryService {
         return categoryRepository.save(category);
     }
 
-    // Generate a new category ID
+    // ID generation
     private String generateCategoryId() {
-        long count = categoryRepository.count();
-        return String.format("category-%03d", count + 1);
-    }
+        Optional<Category> latestCategory = categoryRepository.findTopByOrderByCategoryIdDesc();
+        int maxId = 0;
 
-    // Update an existing category by id
-    public Category updateCategory(ObjectId id, Category category) {
-        if (!categoryRepository.existsById(id)) {
-            throw new ResourceNotFoundException("Category not found with id " + id);
+        if (latestCategory.isPresent()) {
+            String categoryId = latestCategory.get().getCategoryId();
+            try {
+                int numericPart = Integer.parseInt(categoryId.split("-")[1]);
+                maxId = numericPart;
+            } catch (NumberFormatException | ArrayIndexOutOfBoundsException e) {
+                System.err.println("Error parsing categoryId: " + categoryId + ". Using default maxId.");
+            }
         }
-        // Ensure the ID in the request body matches the ID in the URL
-        category.setId(id);
-        return categoryRepository.save(category);
+
+        int nextId = maxId + 1;
+        return String.format("category-%03d", nextId);
     }
 
-    // Delete a category by id
-    public void deleteCategory(ObjectId id) {
-        if (!categoryRepository.existsById(id)) {
-            throw new ResourceNotFoundException("Category not found with id " + id);
+
+
+
+
+    public Category updateCategory(String categoryId, String categoryName, String categoryDescription, MultipartFile categoryImage) throws IOException {
+        Category existingCategory = categoryRepository.findByCategoryId(categoryId)
+                .orElseThrow(() -> new ResourceNotFoundException("Category not found with id " + categoryId));
+
+        String categoryImageFilename = handleCategoryImageUpload(categoryImage);
+
+        if (categoryName != null && !categoryName.isEmpty()) {
+            existingCategory.setCategoryName(categoryName);
         }
-        categoryRepository.deleteById(id);
+
+        if (categoryDescription != null && !categoryDescription.isEmpty()) {
+            existingCategory.setCategoryDescription(categoryDescription);
+        }
+
+        if (categoryImageFilename != null) {
+            existingCategory.setCategoryImage(categoryImageFilename);
+        }
+
+        return categoryRepository.save(existingCategory);
     }
 
+    private String handleCategoryImageUpload(MultipartFile categoryImage) throws IOException {
+        if (categoryImage != null && !categoryImage.isEmpty()) {
+            String timestamp = new SimpleDateFormat("yyyyMMddHHmmss").format(new Date());
+            String originalFilename = categoryImage.getOriginalFilename();
+            String fileExtension = "";
+            if (originalFilename != null && originalFilename.contains(".")) {
+                fileExtension = originalFilename.substring(originalFilename.lastIndexOf('.'));
+            }
+            String categoryImageFilename = "category-" + timestamp + fileExtension;
+            fileStorageService.saveFile(categoryImage.getBytes(), categoryImageFilename);
+            return categoryImageFilename;
+        }
+        return null;
+    }
+
+    public void deleteCategory(String categoryId) {
+        Category existingCategory = categoryRepository.findByCategoryId(categoryId)
+                .orElseThrow(() -> new ResourceNotFoundException("Category not found with id " + categoryId));
+        categoryRepository.delete(existingCategory);
+    }
 }
+
+

@@ -4,27 +4,27 @@ import { useNavigate } from 'react-router-dom';
 import '../../CSS/Profile.css';
 import FrtNavigation from "../Navigations/navigation4";
 import SideNavigation from "../Navigations/navigation5";
-import UpdateProductModal from './UpdateProductModal';
+import UpdateCategoryModal from './UpdateCategoryModal';
 
-const AdminViewProduct = () => {
-  const [products, setProducts] = useState([]);
+const ViewCategory = () => {
+  const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedProduct, setSelectedProduct] = useState(null);
+  const [selectedCategory, setSelectedCategory] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [productToDelete, setProductToDelete] = useState(null);
+  const [categoryToDelete, setCategoryToDelete] = useState(null);
   const navigate = useNavigate();
 
   useEffect(() => {
-    axios.get('/product')
+    axios.get('/category')
       .then(response => {
-        setProducts(response.data);
+        setCategories(response.data);
         setLoading(false);
       })
       .catch(() => {
-        setError('Failed to fetch products');
+        setError('Failed to fetch categories');
         setLoading(false);
       });
   }, []);
@@ -33,55 +33,46 @@ const AdminViewProduct = () => {
     setSearchTerm(e.target.value.toLowerCase());
   };
 
-  const handleAddProduct = () => {
-    navigate('/add-product');
+  const handleAddCategory = () => {
+    navigate('/add-category');
   };
 
-  const handleEditProduct = (product) => {
-    setSelectedProduct(product);
+  const handleEditCategory = (category) => {
+    setSelectedCategory(category);
     setShowModal(true);
   };
 
-  const handleDeleteProduct = (product) => {
-    setProductToDelete(product);
+  const handleDeleteCategory = (category) => {
+    setCategoryToDelete(category);
     setShowDeleteModal(true);
   };
 
-  const confirmDeleteProduct = () => {
-    if (productToDelete) {
-      axios.delete(`/product/${productToDelete.productId}`)
+  const confirmDeleteCategory = () => {
+    if (categoryToDelete) {
+      axios.delete(`/category/${categoryToDelete.categoryId}`)
         .then(() => {
-          setProducts(prevProducts => prevProducts.filter(product => product.productId !== productToDelete.productId));
-          setProductToDelete(null);
+          setCategories(prevCategories => prevCategories.filter(category => category.categoryId !== categoryToDelete.categoryId));
           setShowDeleteModal(false);
         })
         .catch(() => {
-          setError('Failed to delete product');
-          setProductToDelete(null);
-          setShowDeleteModal(false);
+          setError('Failed to delete category');
         });
     }
   };
 
-  const cancelDeleteProduct = () => {
-    setProductToDelete(null);
-    setShowDeleteModal(false);
-  };
-
   const handleModalUpdate = () => {
-    axios.get('/product')
+    axios.get('/category')
       .then(response => {
-        setProducts(response.data);
+        setCategories(response.data);
       })
       .catch(() => {
-        setError('Failed to fetch products');
+        setError('Failed to fetch categories');
       });
   };
 
-  const filteredProducts = products.filter(product =>
-    product.productId.toLowerCase().includes(searchTerm) ||
-    product.productName.toLowerCase().includes(searchTerm) ||
-    product.categoryName.toLowerCase().includes(searchTerm)
+  const filteredCategories = categories.filter(category =>
+    category.categoryId.toLowerCase().includes(searchTerm) ||
+    category.categoryName.toLowerCase().includes(searchTerm)
   );
 
   return (
@@ -101,14 +92,14 @@ const AdminViewProduct = () => {
                   <input
                     type="text"
                     className="form-control search-input"
-                    placeholder="Search Products..."
+                    placeholder="Search Categories..."
                     value={searchTerm}
                     onChange={handleSearchChange}
                   />
                 </div>
                 <div className="button-container">
-                  <button className="btn-gold-add" onClick={handleAddProduct}>
-                    Add Product
+                  <button className="btn-gold-add" onClick={handleAddCategory}>
+                    Add Category
                   </button>
                 </div>
               </div>
@@ -118,38 +109,34 @@ const AdminViewProduct = () => {
                   <table className="custom-table">
                     <thead>
                       <tr>
-                        <th>Product ID</th>
-                        <th>Product Name</th>
-                        <th>Category</th>
-                        <th>Price</th>
+                        <th>Category ID</th>
+                        <th>Category Name</th>
                         <th>Description</th>
-                        <th>Product Image</th>
+                        <th>Category Image</th>
                         <th>Actions</th>
                       </tr>
                     </thead>
                     <tbody>
-                      {filteredProducts.map(product => (
-                        <tr key={product.productId}>
-                          <td>{product.productId}</td>
-                          <td>{product.productName}</td>
-                          <td>{product.categoryName}</td>
-                          <td>Rs. {product.productPrice.toFixed(2)}</td>
-                          <td>{product.productDescription}</td>
+                      {filteredCategories.map(category => (
+                        <tr key={category.id}>
+                          <td>{category.categoryId}</td>
+                          <td>{category.categoryName}</td>
+                          <td>{category.categoryDescription}</td>
                           <td>
-                            <img  src={`/images/${product.productImage}`} alt={product.productName} className="product-pic-admin" />
+                            <img src={`/images/${category.categoryImage}`} alt={category.categoryName} className="product-pic-admin" />
                           </td>
                           <td>
                             <button
                               className="btn-confirm"
-                              onClick={() => handleEditProduct(product)}
+                              onClick={() => handleEditCategory(category)}
                             >
-                              Edit Product
+                              Edit Category
                             </button>
                             <button
                               className="btn-deny"
-                              onClick={() => handleDeleteProduct(product)}
+                              onClick={() => handleDeleteCategory(category)}
                             >
-                              Delete Product
+                              Delete Category
                             </button>
                           </td>
                         </tr>
@@ -163,12 +150,14 @@ const AdminViewProduct = () => {
         </div>
       </div>
 
-      <UpdateProductModal
-        show={showModal}
-        handleClose={() => setShowModal(false)}
-        product={selectedProduct}
-        onUpdate={handleModalUpdate}
-      />
+      {showModal && (
+        <UpdateCategoryModal
+          show={showModal}
+          handleClose={() => setShowModal(false)}
+          category={selectedCategory}
+          onUpdate={handleModalUpdate}
+        />
+      )}
 
       {showDeleteModal && (
         <div className="modal-backdrop-blur">
@@ -180,17 +169,17 @@ const AdminViewProduct = () => {
                   <button
                     type="button"
                     className="btn-close"
-                    onClick={cancelDeleteProduct}
+                    onClick={() => setShowDeleteModal(false)}
                   >
                     &times;
                   </button>
                 </div>
                 <div className="modal-body">
-                  <p>Are you sure you want to delete this Product? This action cannot be undone.</p>
+                  <p>Are you sure you want to delete this category? This action cannot be undone.</p>
                 </div>
                 <div className="modal-footer">
-                  <button className="btn btn-secondary" onClick={cancelDeleteProduct}>Cancel</button>
-                  <button className="btn btn-danger" onClick={confirmDeleteProduct}>Delete</button>
+                  <button className="btn btn-secondary" onClick={() => setShowDeleteModal(false)}>Cancel</button>
+                  <button className="btn btn-danger" onClick={confirmDeleteCategory}>Delete</button>
                 </div>
               </div>
             </div>
@@ -201,4 +190,4 @@ const AdminViewProduct = () => {
   );
 };
 
-export default AdminViewProduct;
+export default ViewCategory;
