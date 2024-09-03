@@ -11,7 +11,7 @@ const StaffDashboard = () => {
   const [showModal, setShowModal] = useState(false);
   const [currentReservationId, setCurrentReservationId] = useState(null);
   const [statusToUpdate, setStatusToUpdate] = useState('');
- 
+  const [searchTerm, setSearchTerm] = useState('');
 
   useEffect(() => {
     const fetchUserBranch = async () => {
@@ -37,6 +37,8 @@ const StaffDashboard = () => {
             'Authorization': `Bearer ${token}`,
           },
         });
+
+        console.log(response.data);
 
         const filteredReservations = response.data.filter(
           (reservation) => reservation.branch.trim() === userBranch
@@ -92,12 +94,41 @@ const StaffDashboard = () => {
     }
   };
 
+  const handleSearchChange = (event) => {
+    setSearchTerm(event.target.value);
+  };
+
+  const filteredReservations = reservations.filter((reservation) => {
+    
+    const reservationId = typeof reservation.reservationId === 'string' ? reservation.reservationId.toLowerCase() : '';
+    const name = typeof reservation.name === 'string' ? reservation.name.toLowerCase() : '';
+    const email = typeof reservation.email === 'string' ? reservation.email.toLowerCase() : '';
+    const phoneNumber = typeof reservation.phoneNumber === 'string' ? reservation.phoneNumber.toLowerCase() : '';
+
+    const lowerCaseSearchTerm = searchTerm.toLowerCase();
+    return reservationId.includes(lowerCaseSearchTerm) ||
+          name.includes(lowerCaseSearchTerm) ||
+          email.includes(lowerCaseSearchTerm) ||
+          phoneNumber.includes(lowerCaseSearchTerm);
+  });
+
   return (
     <div>
       <TrdNavigation />
       <h1 className="form-head-one">
         <span>{userBranch} Reservations</span>
       </h1>
+      
+      <div className="search-container-one">
+        <input
+          type="text"
+          className="form-control search-input"
+          placeholder="Search Reservations..."
+          value={searchTerm}
+          onChange={handleSearchChange}
+        />
+      </div>
+
       <div className="gallery-container">
         <div className="gallery-content">
           <table className="custom-table">
@@ -116,8 +147,8 @@ const StaffDashboard = () => {
               </tr>
             </thead>
             <tbody>
-              {reservations.length > 0 ? (
-                reservations.map((reservation) => (
+              {filteredReservations.length > 0 ? (
+                filteredReservations.map((reservation) => (
                   <tr key={reservation.reservationId}>
                     <td>{reservation.reservationId}</td>
                     <td>{reservation.name}</td>

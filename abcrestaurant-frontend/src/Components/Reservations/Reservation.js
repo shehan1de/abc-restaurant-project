@@ -2,9 +2,9 @@ import Aos from "aos";
 import axios from "axios";
 import { useEffect, useState } from "react";
 import Swal from "sweetalert2";
-import '../CSS/Form.css';
-import Footer from "./footer";
-import Navigation from "./Navigations/navigation";
+import '../../CSS/Form.css';
+import Footer from "../footer";
+import Navigation from "../Navigations/navigation";
 
 const Reservation = () => {
     useEffect(() => {
@@ -122,7 +122,7 @@ const Reservation = () => {
 
             <div className="container mt-5" data-aos="fade-up">
                 {loading ? (
-                    <div className="d-flex flex-column justify-content-center align-items-center" style={{ minHeight: '80vh' }}>
+                    <div className="d-flex flex-column justify-content-center align-items-center" style={{ blockSize: '80vh' }}>
                         <div className="spinner-border text-primary" role="status">
                             <span className="visually-hidden">Loading...</span>
                         </div>

@@ -19,4 +19,6 @@ public class Offer {
     private String offerDescription;
     private String offerName;
     private float offerValue;
+
+
 }

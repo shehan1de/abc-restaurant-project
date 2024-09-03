@@ -18,9 +18,15 @@ import Contact from './Components/Contact';
 import AdminDashboard from './Components/Dashboard/AdminDashboard';
 import CustomerDashboard from './Components/Dashboard/CustomerDashboard';
 import StaffDashboard from './Components/Dashboard/StaffDashboard';
-import FeedbackResponse from './Components/Feedback';
+import AdminFeedback from './Components/Feedback/AdminFeedback';
+import FeedbackResponse from './Components/Feedback/Feedback';
 import Gallery from './Components/Gallery';
+import AddImage from './Components/Gallery/AddImage';
+import ViewGallery from './Components/Gallery/ViewGallery';
 import Index from './Components/Index';
+import AddOffer from './Components/Offer/AddOffer';
+import ViewOffer from './Components/Offer/ViewOffer';
+import AdminOrder from './Components/Order/AdminOrder';
 import Checkout from './Components/Order/Checkout';
 import OrderStaff from './Components/Order/OrderStaff';
 import Purchases from './Components/Order/Purchases';
@@ -30,7 +36,8 @@ import Favorites from './Components/Product/Favorites';
 import Menu from './Components/Product/Menu';
 import ProductView from './Components/Product/ProductView';
 import ProtectedRoute from './Components/ProtectedRoute';
-import Reservation from './Components/Reservation';
+import AdminReservation from './Components/Reservations/AdminReservation';
+import Reservation from './Components/Reservations/Reservation';
 
 
 function App() {
@@ -70,6 +77,13 @@ function App() {
         <Route path="/add-product" element={<ProtectedRoute element={AddProduct} allowedRoles={['Admin']} />} />
         <Route path="/view-category" element={<ProtectedRoute element={ViewCategory} allowedRoles={['Admin']} />} />
         <Route path="/add-category" element={<ProtectedRoute element={AddCategory} allowedRoles={['Admin']} />} />
+        <Route path="/view-gallery" element={<ProtectedRoute element={ViewGallery} allowedRoles={['Admin']} />} />
+        <Route path="/add-image" element={<ProtectedRoute element={AddImage} allowedRoles={['Admin']} />} />
+        <Route path="/admin-reservation" element={<ProtectedRoute element={AdminReservation} allowedRoles={['Admin']} />} />
+        <Route path="/admin-feedback" element={<ProtectedRoute element={AdminFeedback} allowedRoles={['Admin']} />} />
+        <Route path="/admin-order" element={<ProtectedRoute element={AdminOrder} allowedRoles={['Admin']} />} />
+        <Route path="/view-offer" element={<ProtectedRoute element={ViewOffer} allowedRoles={['Admin']} />} />
+        <Route path="/add-offer" element={<ProtectedRoute element={AddOffer} allowedRoles={['Admin']} />} />
       </Routes>
     </Router>
   );

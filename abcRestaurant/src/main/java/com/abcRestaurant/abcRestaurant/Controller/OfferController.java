@@ -1,5 +1,6 @@
 package com.abcRestaurant.abcRestaurant.Controller;
 
+import com.abcRestaurant.abcRestaurant.Model.Branch;
 import com.abcRestaurant.abcRestaurant.Model.Offer;
 import com.abcRestaurant.abcRestaurant.Service.OfferService;
 import org.bson.types.ObjectId;
@@ -36,15 +37,15 @@ public class OfferController {
         return new ResponseEntity<>(newOffer, HttpStatus.CREATED);
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<Offer> updateOffer(@PathVariable("id") ObjectId id, @RequestBody Offer offer) {
-        Offer updatedOffer = offerService.updateOffer(id, offer);
+    @PutMapping("/{offerId}")
+    public ResponseEntity<Offer> updateOffer(@PathVariable("offerId") String offerId, @RequestBody Offer offer) {
+        Offer updatedOffer = offerService.updateOffer(offerId, offer);
         return ResponseEntity.ok(updatedOffer);
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteOffer(@PathVariable("id") ObjectId id) {
-        offerService.deleteOffer(id);
+    @DeleteMapping("/{offerId}")
+    public ResponseEntity<Void> deleteOffer(@PathVariable("offerId") String offerId) {
+        offerService.deleteOffer(offerId);
         return ResponseEntity.noContent().build();
     }
 

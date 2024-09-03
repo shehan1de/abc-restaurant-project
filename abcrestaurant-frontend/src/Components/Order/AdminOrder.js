@@ -1,13 +1,12 @@
 import axios from 'axios';
-import { jwtDecode } from 'jwt-decode';
 import React, { useEffect, useState } from 'react';
 import '../../CSS/Profile.css';
 import SecFooter from '../footer2';
-import TrdNavigation from '../Navigations/navigation3';
+import FrtNavigation from '../Navigations/navigation4';
+import SideNavigation from '../Navigations/navigation5';
 
-const OrderStaff = () => {
+const AdminOrder = () => {
   const [orders, setOrders] = useState([]);
-  const [userBranch, setUserBranch] = useState('');
   const [showModal, setShowModal] = useState(false);
   const [showProductsModal, setShowProductsModal] = useState(false);
   const [currentOrderId, setCurrentOrderId] = useState(null);
@@ -17,22 +16,13 @@ const OrderStaff = () => {
   const [filteredOrders, setFilteredOrders] = useState([]);
 
   useEffect(() => {
-    const fetchUserBranchAndOrders = async () => {
-      try {
+    const fetchUserOrders = async () => {
+    
         const token = localStorage.getItem('token');
         if (!token) throw new Error('No token found');
 
-        const decoded = jwtDecode(token);
-        console.log('Decoded token:', decoded);
-
-        const userResponse = await axios.get(`/user/${decoded.userId}`, {
-          headers: {
-            'Authorization': `Bearer ${token}`,
-          },
-        });
-        console.log('User response:', userResponse.data);
-        const branch = userResponse.data.branch.trim();
-        setUserBranch(branch);
+        
+        
 
         const ordersResponse = await axios.get('/orders', {
           headers: {
@@ -42,7 +32,7 @@ const OrderStaff = () => {
         console.log('Orders response:', ordersResponse.data);
 
         const filteredOrders = ordersResponse.data.filter(
-          (order) => order.branch.trim() === branch
+          (order) => order.branch.trim()
         );
         console.log('Filtered orders:', filteredOrders);
 
@@ -50,12 +40,10 @@ const OrderStaff = () => {
 
         setOrders(sortedOrders);
         setFilteredOrders(sortedOrders);
-      } catch (error) {
-        console.error('Error fetching user branch or orders:', error);
-      }
-    };
+      
+    }
 
-    fetchUserBranchAndOrders();
+    fetchUserOrders();
   }, []);
 
   useEffect(() => {
@@ -118,25 +106,22 @@ const OrderStaff = () => {
 
   return (
     <div>
-      <TrdNavigation />
-      <h1 className="form-head-one">
-        <span>{userBranch} Orders</span>
-      </h1>
+      <FrtNavigation />
       <div className="gallery-container">
-        <div className="gallery-content">
-         
+        <SideNavigation />
+        <div className="add-user-container">
 
+        <div className="search-container-one">
+          <input
+            type="text"
+            className="form-control search-input"
+            placeholder="Search Orders..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+        </div>
+        <p className='sub-par'>Note - Click on the Order ID to view the products included in the order.</p>
 
-<div className="search-container-one">
-        <input
-          type="text"
-          className="form-control search-input"
-          placeholder="Search Orders..."
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-        />
-      </div>
-      <p className='sub-par'>Note - Click on the Order ID to view the products included in the order.</p>
           <table className="custom-table">
             <thead>
               <tr>
@@ -313,4 +298,4 @@ const OrderStaff = () => {
   );
 };
 
-export default OrderStaff;
+export default AdminOrder;

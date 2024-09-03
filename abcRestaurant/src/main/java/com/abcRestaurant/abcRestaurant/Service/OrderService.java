@@ -76,6 +76,13 @@ public class OrderService {
         order.setOrderStatus(orderStatus);
         return orderRepository.save(order);
     }
+
+
+    // Get a single order by id
+    public Order findOrderById(String orderId) {
+        return orderRepository.findByOrderId(orderId)
+                .orElseThrow(() -> new ResourceNotFoundException("Order not found with id " + orderId));
+    }
 }
 
 

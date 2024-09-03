@@ -10,4 +10,5 @@ import java.util.Optional;
 
 public interface BranchRepository extends MongoRepository<Branch, ObjectId> {
     Optional<Branch> findByBranchId(String branchId);
+
 }

@@ -61,19 +61,19 @@ const SideNavigation = () => {
                         <Link className={`nav-link ${location.pathname === '/beverages' ? 'active' : ''}`} to="/beverages">Reports</Link>
                     </li>
                     <li className="nav-item">
-                        <Link className={`nav-link ${location.pathname === '/desserts' ? 'active' : ''}`} to="/desserts">Offers</Link>
+                        <Link className={`nav-link ${location.pathname === '/view-offer' ? 'active' : ''}`} to="/view-offer">Offers</Link>
                     </li>
                     <li className="nav-item">
-                        <Link className={`nav-link ${location.pathname === '/other' ? 'active' : ''}`} to="/other">Gallery</Link>
+                        <Link className={`nav-link ${location.pathname === '/view-gallery' ? 'active' : ''}`} to="/view-gallery">Gallery</Link>
                     </li>
                     <li className="nav-item">
-                        <Link className={`nav-link ${location.pathname === '/other' ? 'active' : ''}`} to="/other">Reservation</Link>
+                        <Link className={`nav-link ${location.pathname === '/admin-reservation' ? 'active' : ''}`} to="/admin-reservation">Reservation</Link>
                     </li>
                     <li className="nav-item">
-                        <Link className={`nav-link ${location.pathname === '/other' ? 'active' : ''}`} to="/other">Feedbacks</Link>
+                        <Link className={`nav-link ${location.pathname === '/admin-feedback' ? 'active' : ''}`} to="/admin-feedback">Feedbacks</Link>
                     </li>
                     <li className="nav-item">
-                        <Link className={`nav-link ${location.pathname === '/other' ? 'active' : ''}`} to="/other">Orders</Link>
+                        <Link className={`nav-link ${location.pathname === '/admin-order' ? 'active' : ''}`} to="/admin-order">Orders</Link>
                     </li>
                     <li className="nav-item">
                         <button className="btn-gold-add" onClick={handleLogout}>Logout</button>
