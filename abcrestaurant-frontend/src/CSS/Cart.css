@@ -383,4 +383,23 @@
   .order-status.denied {
     background-color: red;
   }
+  .order-id {
+    position: relative;
+    display: flex;
+    align-items: center;
+  }
+  
+  .btn-download-receipt {
+    position: absolute;
+    right: -20px; 
+    background-color: transparent;
+    border: none;
+    color: #4125f7;
+    font-size: 1.5rem;
+    cursor: pointer;
+  }
+  
+  .btn-download-receipt:hover {
+    color: #4125f7;
+  }
   

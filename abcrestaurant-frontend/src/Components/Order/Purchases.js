@@ -28,6 +28,19 @@ const Purchases = () => {
     fetchOrders();
   }, []);
 
+  const handleDownloadBill = async (orderId) => {
+    try {
+      const response = await axios.get(`/orders/${orderId}/bill`, {
+        responseType: 'arraybuffer'
+      });
+      const blob = new Blob([response.data], { type: 'application/pdf' });
+      const url = window.URL.createObjectURL(blob);
+      window.open(url, '_blank');
+    } catch (error) {
+      console.error('Error downloading bill', error);
+    }
+  };
+
   const formatAmount = (amount) => {
     return amount.toFixed(2);
   };
@@ -41,7 +54,18 @@ const Purchases = () => {
         {orders.map(order => (
           <div key={order._id} className="order-card">
             <div className="order-info">
-              <div className='order-id'><strong>{order.orderId}</strong></div>
+              <div className='order-id'>
+                <strong>{order.orderId}</strong>
+                {order.orderStatus === 'Accepted' && (
+                  <button 
+                    className="btn-download-receipt"
+                    onClick={() => handleDownloadBill(order.orderId)}
+                    title="Download Receipt"
+                  >
+                    <i className="bi bi-box-arrow-down"></i>
+                  </button>
+                )}
+              </div>
               <div className="order-items">
                   {order.items.map((item, index) => (
                     <span key={index}>
