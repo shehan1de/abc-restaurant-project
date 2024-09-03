@@ -36,6 +36,7 @@ import Favorites from './Components/Product/Favorites';
 import Menu from './Components/Product/Menu';
 import ProductView from './Components/Product/ProductView';
 import ProtectedRoute from './Components/ProtectedRoute';
+import Reports from './Components/Reports';
 import AdminReservation from './Components/Reservations/AdminReservation';
 import Reservation from './Components/Reservations/Reservation';
 
@@ -84,6 +85,7 @@ function App() {
         <Route path="/admin-order" element={<ProtectedRoute element={AdminOrder} allowedRoles={['Admin']} />} />
         <Route path="/view-offer" element={<ProtectedRoute element={ViewOffer} allowedRoles={['Admin']} />} />
         <Route path="/add-offer" element={<ProtectedRoute element={AddOffer} allowedRoles={['Admin']} />} />
+        <Route path="/reports" element={<ProtectedRoute element={Reports} allowedRoles={['Admin']} />} />
       </Routes>
     </Router>
   );

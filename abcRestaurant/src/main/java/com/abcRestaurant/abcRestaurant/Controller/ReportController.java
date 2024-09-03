@@ -21,7 +21,7 @@ public class ReportController {
     private ReportService reportService;
 
     @GetMapping("/sales")
-    public ResponseEntity<byte[]> generateSalesReport(@RequestParam(required = false) String orderId) {
+    public ResponseEntity<byte[]> generateSalesBill(@RequestParam(required = false) String orderId) {
         byte[] pdfBytes;
         HttpHeaders headers = new HttpHeaders();
 

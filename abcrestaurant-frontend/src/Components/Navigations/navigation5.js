@@ -58,7 +58,7 @@ const SideNavigation = () => {
                         <Link className={`nav-link ${location.pathname === '/view-category' ? 'active' : ''}`} to="/view-category">Category</Link>
                     </li>
                     <li className="nav-item">
-                        <Link className={`nav-link ${location.pathname === '/beverages' ? 'active' : ''}`} to="/beverages">Reports</Link>
+                        <Link className={`nav-link ${location.pathname === '/reports' ? 'active' : ''}`} to="/reports">Reports</Link>
                     </li>
                     <li className="nav-item">
                         <Link className={`nav-link ${location.pathname === '/view-offer' ? 'active' : ''}`} to="/view-offer">Offers</Link>

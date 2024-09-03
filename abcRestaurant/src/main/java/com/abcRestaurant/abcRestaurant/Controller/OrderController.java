@@ -3,6 +3,7 @@ package com.abcRestaurant.abcRestaurant.Controller;
 import com.abcRestaurant.abcRestaurant.Exception.DocumentException;
 import com.abcRestaurant.abcRestaurant.Model.Order;
 import com.abcRestaurant.abcRestaurant.Model.Product;
+import com.abcRestaurant.abcRestaurant.Model.SalesReportData;
 import com.abcRestaurant.abcRestaurant.Service.ConfirmOrdEmailService;
 import com.abcRestaurant.abcRestaurant.Service.OrderService;
 import com.abcRestaurant.abcRestaurant.Service.OrderEmailService;
@@ -11,10 +12,13 @@ import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @RestController
@@ -36,7 +40,7 @@ public class OrderController {
         this.confirmOrdEmailService = confirmOrdEmailService;
         this.reportService = reportService;
     }
-    
+
 
     @GetMapping
     public ResponseEntity<List<Order>> getAllOrders() {
@@ -125,6 +129,45 @@ public class OrderController {
             headers.add(HttpHeaders.CONTENT_LENGTH, String.valueOf(pdfBytes.length));
 
             return new ResponseEntity<>(pdfBytes, headers, HttpStatus.OK);
+        } catch (IOException | com.itextpdf.text.DocumentException e) {
+            e.printStackTrace();
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @GetMapping("/sales-report")
+    public ResponseEntity<byte[]> generateSalesReportPDF(@RequestParam String startDate, @RequestParam String endDate) {
+        try {
+            LocalDateTime start = LocalDateTime.parse(startDate, DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+            LocalDateTime end = LocalDateTime.parse(endDate, DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+
+            byte[] salesReportPdf = reportService.generateSalesReportPDF(start, end);
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_PDF);
+            headers.setContentDispositionFormData("attachment", "sales_report.pdf");
+
+            return new ResponseEntity<>(salesReportPdf, headers, HttpStatus.OK);
+        } catch (IOException | com.itextpdf.text.DocumentException e) {
+            e.printStackTrace();
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+
+    @GetMapping("/financial-report")
+    public ResponseEntity<byte[]> generateFinancialReportPDF(@RequestParam String startDate, @RequestParam String endDate) {
+        try {
+            LocalDateTime start = LocalDateTime.parse(startDate, DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+            LocalDateTime end = LocalDateTime.parse(endDate, DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+
+            byte[] financialReportPdf = reportService.generateFinancialReportPDF(start, end);
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_PDF);
+            headers.setContentDispositionFormData("attachment", "financial_report.pdf");
+
+            return new ResponseEntity<>(financialReportPdf, headers, HttpStatus.OK);
         } catch (IOException | com.itextpdf.text.DocumentException e) {
             e.printStackTrace();
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
