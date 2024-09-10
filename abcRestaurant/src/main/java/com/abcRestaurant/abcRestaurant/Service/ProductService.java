@@ -107,7 +107,6 @@ public class ProductService {
         productRepository.delete(existingProduct);
     }
 
-    // Get products by category name
     public List<Product> getProductsByCategory(String categoryName) {
         return productRepository.findByCategoryName(categoryName);
     }

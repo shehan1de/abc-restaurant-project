@@ -50,6 +50,7 @@ const Reservation = () => {
         } else if (!/^\d+$/.test(reservation.phoneNumber)) {
             errors.phoneNumber = "Phone number must be digits only";
         }
+        if (!reservation.branch)errors.branch="Branch is required";
         if (!reservation.date) errors.date = "Date is required";
         if (!reservation.time) errors.time = "Time is required";
         if (!reservation.persons) errors.persons = "Number of persons is required";
@@ -265,7 +266,11 @@ const Reservation = () => {
                             </div>
                         </div>
 
-                        <button type="submit" className="btn btn-primary-submit">Submit Reservation</button>
+                        {/* <button type="submit" className="btn btn-primary-submit" id="submitReservation">Submit Reservation</button> */}
+
+                        <div className="d-flex justify-content-between align-items-center mb-3">
+                            <button type="submit" className="btn btn-primary-submit" id='submitReservation'>Submit Reservation</button>
+                        </div>
                     </form>
                 )}
             </div>

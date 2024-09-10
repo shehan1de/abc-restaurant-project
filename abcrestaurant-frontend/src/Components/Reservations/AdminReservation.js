@@ -2,6 +2,7 @@ import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import FrtNavigation from "../Navigations/navigation4";
 import SideNavigation from "../Navigations/navigation5";
+import SecFooter from '../footer2';
 
 const AdminReservation = () => {
   const [reservations, setReservations] = useState([]);
@@ -215,8 +216,10 @@ const AdminReservation = () => {
               </div>
             </div>
           </div>
+
         </>
       )}
+      <SecFooter/>
     </>
   );
 };

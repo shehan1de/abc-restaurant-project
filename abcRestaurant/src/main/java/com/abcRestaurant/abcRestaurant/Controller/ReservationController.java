@@ -58,7 +58,6 @@ public class ReservationController {
     public ResponseEntity<Reservation> updateReservationStatus(@PathVariable String reservationId, @RequestParam String status) {
         try {
             Reservation updatedReservation = reservationService.updateReservationStatus(reservationId, status);
-            // Send email notification after updating reservation status
             confirmResEmailService.sendStatusUpdateEmail(
                     updatedReservation.getEmail(),
                     reservationId,

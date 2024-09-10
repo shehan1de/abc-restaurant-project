@@ -61,7 +61,9 @@ const Login = () => {
                     text: `Login successful! Now you are logged in as a ${user.userType}.`,
                     icon: 'success',
                     timer: 2500,
-                    showConfirmButton: false
+                    showConfirmButton: false,
+                    id:'successLogin'
+                
                 });
 
                 setLoading(false);
@@ -89,7 +91,8 @@ const Login = () => {
                     text: 'Invalid Email or Password...Try Again',
                     icon: 'error',
                     timer: 2500,
-                    showConfirmButton: false
+                    showConfirmButton: false,
+                    id:'errorLogin'
                 });
             } finally {
                 setLoading(false);
@@ -154,7 +157,7 @@ const Login = () => {
                         </div>
 
                         <div className="d-flex justify-content-between align-items-center mb-3">
-                            <button type="submit" className="btn btn-primary-submit" disabled={loading}>SIGN IN</button>
+                            <button type="submit" className="btn btn-primary-submit" id='submitLogin' disabled={loading}>SIGN IN</button>
                         </div>
 
                         <p className="mt-3 text-center">

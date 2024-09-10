@@ -1,5 +1,6 @@
 package com.abcRestaurant.abcRestaurant.Service;
 
+import com.abcRestaurant.abcRestaurant.Model.Branch;
 import com.abcRestaurant.abcRestaurant.Model.Feedback;
 import com.abcRestaurant.abcRestaurant.Repository.FeedbackRepository;
 import com.abcRestaurant.abcRestaurant.Exception.ResourceNotFoundException;
@@ -36,8 +37,21 @@ public class FeedbackService {
 
     // Generate a new feedback ID
     private String generateFeedbackId() {
-        long count = feedbackRepository.count();
-        return String.format("feedback-%03d", count + 1);
+        List<Feedback> feedbacks = feedbackRepository.findAll();
+        int maxId = 0;
+        for (Feedback feedback : feedbacks) {
+            String feedbackId = feedback.getFeedbackId();
+            try {
+                int numericPart = Integer.parseInt(feedbackId.split("-")[1]);
+                if (numericPart > maxId) {
+                    maxId = numericPart;
+                }
+            } catch (NumberFormatException | ArrayIndexOutOfBoundsException e) {
+                System.err.println("Error parsing feedbackId: " + feedbackId + ". Skipping this entry.");
+            }
+        }
+        int nextId = maxId + 1;
+        return String.format("feedback-%03d", nextId);
     }
 
     // Update an existing feedback by id

@@ -3,6 +3,7 @@ import { useState } from 'react';
 import Swal from 'sweetalert2';
 import FrtNavigation from "./Navigations/navigation4";
 import SideNavigation from "./Navigations/navigation5";
+import SecFooter from './footer2';
 
 const Reports = () => {
   const [startDate, setStartDate] = useState('');
@@ -127,6 +128,7 @@ const Reports = () => {
           </div>
         </div>
       </div>
+      <SecFooter/>
     </>
   );
 };

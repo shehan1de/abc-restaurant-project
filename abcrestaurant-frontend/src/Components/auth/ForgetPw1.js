@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
 import '../../CSS/Form.css';
+import SecFooter from '../footer2';
 
 const ForgetPw1 = () => {
     const [email, setEmail] = useState('');
@@ -22,7 +23,6 @@ const ForgetPw1 = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        // Validate email
         const errors = {};
         if (!email) {
             errors.email = 'Email is required.';
@@ -47,7 +47,6 @@ const ForgetPw1 = () => {
             });
     
             if (response.status === 200) {
-                // Save email to local storage
                 localStorage.setItem('resetEmail', email);
     
                 Swal.fire({
@@ -70,19 +69,20 @@ const ForgetPw1 = () => {
             }
         } catch (error) {
             console.error('Error during password reset request:', error);
-    
+        
             Swal.fire({
                 title: 'Error!',
-                text: error.response?.data?.message || 'Failed to send password reset email. Please try again later.',
+                text: error.response?.data?.message || `No account associated with ${email}`,
                 icon: 'error',
-                confirmButtonText: false
+                timer: 2500,
+                showConfirmButton: false
             });
         } finally {
             setLoading(false);
         }
     };
 
-    return (
+    return (<>
         <div className="email-container">
             <form onSubmit={handleSubmit} className="login-form">
                 <h1 className="form-head">
@@ -129,7 +129,10 @@ const ForgetPw1 = () => {
                     </>
                 )}
             </form>
+            
         </div>
+        <SecFooter/>
+        </>
     );
 };
 

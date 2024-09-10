@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
 import '../../CSS/Form.css';
+import SecFooter from '../footer2';
 
 const ResetPw = () => {
     const [password, setPassword] = useState('');
@@ -126,7 +127,7 @@ const ResetPw = () => {
         }
     };
 
-    return (
+    return (<>
         <div className="email-container">
             <form onSubmit={handleSubmit} className="login-form">
                 <h1 className="form-head">
@@ -193,6 +194,8 @@ const ResetPw = () => {
                 )}
             </form>
         </div>
+        <SecFooter/>
+        </>
     );
 };
 

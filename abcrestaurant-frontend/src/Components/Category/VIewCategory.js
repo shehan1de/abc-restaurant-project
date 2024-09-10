@@ -2,6 +2,7 @@ import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import '../../CSS/Profile.css';
+import SecFooter from '../footer2';
 import FrtNavigation from "../Navigations/navigation4";
 import SideNavigation from "../Navigations/navigation5";
 import UpdateCategoryModal from './UpdateCategoryModal';
@@ -186,6 +187,7 @@ const ViewCategory = () => {
           </div>
         </div>
       )}
+      <SecFooter/>
     </>
   );
 };

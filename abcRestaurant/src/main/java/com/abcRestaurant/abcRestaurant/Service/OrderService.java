@@ -1,5 +1,6 @@
 package com.abcRestaurant.abcRestaurant.Service;
 
+import com.abcRestaurant.abcRestaurant.Model.Feedback;
 import com.abcRestaurant.abcRestaurant.Model.FinancialReportData;
 import com.abcRestaurant.abcRestaurant.Model.Order;
 import com.abcRestaurant.abcRestaurant.Model.SalesReportData;
@@ -63,10 +64,23 @@ public class OrderService {
         orderRepository.deleteById(id);
     }
 
-    // Generate a unique order ID
+    // Generate a new Order ID
     private String generateOrderId() {
-        long count = orderRepository.count();
-        return String.format("order-%03d", count + 1);
+        List<Order> orders = orderRepository.findAll();
+        int maxId = 0;
+        for (Order order : orders) {
+            String orderId = order.getOrderId();
+            try {
+                int numericPart = Integer.parseInt(orderId.split("-")[1]);
+                if (numericPart > maxId) {
+                    maxId = numericPart;
+                }
+            } catch (NumberFormatException | ArrayIndexOutOfBoundsException e) {
+                System.err.println("Error parsing orderId: " + orderId + ". Skipping this entry.");
+            }
+        }
+        int nextId = maxId + 1;
+        return String.format("order-%03d", nextId);
     }
 
     // Method to update order status

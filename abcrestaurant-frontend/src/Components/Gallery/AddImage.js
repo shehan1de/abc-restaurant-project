@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
 import '../../CSS/Form.css'; // Assuming you have a CSS file for styling
 import FrtNavigation from '../Navigations/navigation4';
+import SecFooter from '../footer2';
 
 const AddImage = () => {
     const [formData, setFormData] = useState({
@@ -182,6 +183,8 @@ const AddImage = () => {
                     </form>
                 )}
             </div>
+<SecFooter/>
+
         </>
     );
 };

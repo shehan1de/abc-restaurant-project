@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
 import '../../CSS/Form.css';
+import SecFooter from '../footer2';
 
 const ForgetPw2 = () => {
     const [code, setCode] = useState('');
@@ -15,12 +16,10 @@ const ForgetPw2 = () => {
         const email = localStorage.getItem('resetEmail');
 
         if (!email) {
-            // Redirect to the first page if email is not present
             navigate('/forget-password-1');
             return;
         }
 
-        // Start countdown timer when component mounts
         const timerInterval = setInterval(() => {
             setTimeLeft((prevTime) => {
                 if (prevTime <= 1) {
@@ -46,7 +45,6 @@ const ForgetPw2 = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        // Validate the code field
         const codeError = validateCode(code);
         if (codeError) {
             setErrors({ code: codeError, apiError: '' });
@@ -108,7 +106,7 @@ const ForgetPw2 = () => {
         return `${minutes}:${secs.toString().padStart(2, '0')}`;
     };
 
-    return (
+    return (<>
         <div className="email-container">
             <form onSubmit={handleSubmit} className="login-form">
                 <h1 className="form-head">
@@ -160,6 +158,8 @@ const ForgetPw2 = () => {
                 )}
             </form>
         </div>
+        <SecFooter/>
+        </>
     );
 };
 

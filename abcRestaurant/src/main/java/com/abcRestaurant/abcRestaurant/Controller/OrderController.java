@@ -101,7 +101,6 @@ public class OrderController {
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND);
             }
 
-            // Send email notification after updating order status
             confirmOrdEmailService.sendOrderConfirmation(
                     updatedOrder.getUserEmail(),
                     orderId,

@@ -1,6 +1,7 @@
 package com.abcRestaurant.abcRestaurant.Service;
 
 import com.abcRestaurant.abcRestaurant.Exception.ResourceNotFoundException;
+import com.abcRestaurant.abcRestaurant.Model.Feedback;
 import com.abcRestaurant.abcRestaurant.Model.Reservation;
 import com.abcRestaurant.abcRestaurant.Repository.ReservationRepository;
 import org.bson.types.ObjectId;
@@ -33,8 +34,21 @@ public class ReservationService {
 
     // Generate a new reservation ID
     private String generateReservationId() {
-        long count = reservationRepository.count();
-        return String.format("res-%03d", count + 1);
+        List<Reservation> reservations = reservationRepository.findAll();
+        int maxId = 0;
+        for (Reservation reservation : reservations) {
+            String reservationId = reservation.getReservationId();
+            try {
+                int numericPart = Integer.parseInt(reservationId.split("-")[1]);
+                if (numericPart > maxId) {
+                    maxId = numericPart;
+                }
+            } catch (NumberFormatException | ArrayIndexOutOfBoundsException e) {
+                System.err.println("Error parsing reservationId: " + reservationId + ". Skipping this entry.");
+            }
+        }
+        int nextId = maxId + 1;
+        return String.format("reservation-%03d", nextId);
     }
 
     public Reservation updateReservationStatus(String reservationId, String status) {

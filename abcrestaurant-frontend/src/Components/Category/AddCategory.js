@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
 import '../../CSS/Form.css';
 import FrtNavigation from '../Navigations/navigation4';
+import SecFooter from '../footer2';
 
 const AddCategory = () => {
     const [formData, setFormData] = useState({
@@ -186,6 +187,7 @@ const AddCategory = () => {
                     </form>
                 )}
             </div>
+            <SecFooter/>
         </>
     );
 };

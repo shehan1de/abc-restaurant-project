@@ -4,6 +4,7 @@ import com.abcRestaurant.abcRestaurant.DTO.AuthRequestDTO;
 import com.abcRestaurant.abcRestaurant.DTO.AuthResponseDTO;
 import com.abcRestaurant.abcRestaurant.DTO.UserRequestDTO;
 import com.abcRestaurant.abcRestaurant.DTO.UserResponseDTO;
+import com.abcRestaurant.abcRestaurant.Exception.EmailAlreadyExistsException;
 import com.abcRestaurant.abcRestaurant.Exception.ResourceNotFoundException;
 import com.abcRestaurant.abcRestaurant.Model.User;
 import com.abcRestaurant.abcRestaurant.Repository.UserRepository;
@@ -37,31 +38,44 @@ public class UserService implements UserDetailsService {
     private final VerificationEmailService emailService;
 
     @Autowired
-    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, JwtUtil jwtUtil, VerificationEmailService emailService) {
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, JwtUtil jwtUtil,
+                       VerificationEmailService emailService) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtUtil = jwtUtil;
         this.emailService = emailService;
     }
 
-
-
     @Override
     public UserDetails loadUserByUsername(String userEmail) throws UsernameNotFoundException {
         User user = userRepository.findByUserEmail(userEmail)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + userEmail));
-        return new org.springframework.security.core.userdetails.User(user.getUserEmail(), user.getPassword(), new ArrayList<>());
+        return new org.springframework.security.core.userdetails.User(user.getUserEmail(),
+                user.getPassword(), new ArrayList<>());
     }
 
+    //All User view
     public List<User> allUser() {
         return userRepository.findAll();
     }
 
+    //View single user
     public Optional<User> singleUser(String userId) {
         return userRepository.findByUserId(userId);
     }
 
+    // Check existing emails
+    public boolean checkIfEmailExists(String email) {
+        return userRepository.existsByUserEmail(email);
+    }
+
+    //Register user
     public User addUser(UserRequestDTO userRequestDTO) {
+
+        if (checkIfEmailExists(userRequestDTO.getUserEmail())) {
+            throw new EmailAlreadyExistsException("Email already exists: " + userRequestDTO.getUserEmail());
+        }
+
         User user = new User();
         user.setUserId(generateUserId());
         user.setUsername(userRequestDTO.getUsername());
@@ -75,7 +89,17 @@ public class UserService implements UserDetailsService {
 
         return userRepository.save(user);
     }
+
+    //Add user
     public User userAdd(User user){
+
+        if (userRepository.existsByUserEmail(user.getUserEmail())) {
+            throw new IllegalArgumentException("This email is already registered.");
+        }
+
+        if (checkIfEmailExists(user.getUserEmail())) {
+            throw new EmailAlreadyExistsException("Email already exists: " + user.getUserEmail());
+        }
 
         user.setUserId(generateUserId());
         user.setUsername(user.getUsername());
@@ -87,13 +111,13 @@ public class UserService implements UserDetailsService {
             user.setBranch(user.getBranch());
         }
 
-
         String profilePicture = user.getProfilePicture();
         user.setProfilePicture(profilePicture != null && !profilePicture.isEmpty() ? profilePicture : "default.jpg");
 
         return userRepository.save(user);
     }
 
+    // Generate User ID
     private String generateUserId() {
         List<User> users = userRepository.findAll();
         int maxId = 0;
@@ -112,7 +136,7 @@ public class UserService implements UserDetailsService {
         return String.format("user-%03d", nextId);
     }
 
-
+    //User update
     public User updateUser(String userId, User user) {
         if (!userRepository.existsByUserId(userId)) {
             throw new ResourceNotFoundException("User not found with id " + userId);
@@ -121,6 +145,8 @@ public class UserService implements UserDetailsService {
         return userRepository.save(user);
     }
 
+
+    //Delete user
     public void deleteUser(String userId) {
         if (!userRepository.existsByUserId(userId)) {
             throw new ResourceNotFoundException("User not found with id " + userId);
@@ -128,18 +154,26 @@ public class UserService implements UserDetailsService {
         userRepository.deleteByUserId(userId);
     }
 
+
+    //User login
     public AuthResponseDTO loginUser(AuthRequestDTO authRequestDTO) {
         User user = userRepository.findByUserEmail(authRequestDTO.getUserEmail())
-                .orElseThrow(() -> new ResourceNotFoundException("User not found with email " + authRequestDTO.getUserEmail()));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with email " +
+                        authRequestDTO.getUserEmail()));
         if (passwordEncoder.matches(authRequestDTO.getPassword(), user.getPassword())) {
             String token = jwtUtil.generateToken(user);
-            UserResponseDTO userResponseDTO = new UserResponseDTO(user.getUserId(), user.getUsername(), user.getUserEmail(), user.getPhoneNumber(), user.getUserType(), user.getProfilePicture());
+            UserResponseDTO userResponseDTO = new UserResponseDTO
+                    (user.getUserId(), user.getUsername(), user.getUserEmail(), user.getPhoneNumber(),
+                            user.getUserType()
+                            , user.getProfilePicture());
             return new AuthResponseDTO(token, userResponseDTO);
         } else {
             throw new RuntimeException("Invalid credentials");
         }
     }
 
+
+    //Verification code
     public void sendVerificationCode(String email) {
         Optional<User> userOptional = userRepository.findByUserEmail(email);
         if (userOptional.isPresent()) {
@@ -154,6 +188,8 @@ public class UserService implements UserDetailsService {
         }
     }
 
+
+    //verify the code of reset password
     public boolean verifyCode(String email, String code) {
         Optional<User> userOptional = userRepository.findByUserEmail(email);
         if (userOptional.isPresent()) {
@@ -165,13 +201,14 @@ public class UserService implements UserDetailsService {
         return false;
     }
 
+    // Reset the password
     public void resetPassword(String email, String code, String newPassword) {
         Optional<User> userOptional = userRepository.findByUserEmail(email);
         if (userOptional.isPresent()) {
             User user = userOptional.get();
             if (user.getVerificationCode() != null &&
-                    user.getVerificationCode().equals(code) &&
-                    user.getVerificationCodeExpiry().isAfter(LocalDateTime.now())) {
+                    user.getVerificationCode().equals(code) && user.getVerificationCodeExpiry().isAfter
+                    (LocalDateTime.now())) {
                 user.setPassword(passwordEncoder.encode(newPassword));
                 user.setVerificationCode(null);
                 user.setVerificationCodeExpiry(null);
@@ -184,6 +221,7 @@ public class UserService implements UserDetailsService {
         }
     }
 
+    //verification code generate
     private String generateVerificationCode() {
         return String.format("%06d", new Random().nextInt(1000000));
     }
@@ -199,18 +237,15 @@ public class UserService implements UserDetailsService {
         }
     }
 
-
-
-
-
-    public User updateUserProfile(String userId, String username, Long phoneNumber, MultipartFile profilePicture,String userEmail, String userType, String branch) throws IOException {
+    //Update user profile
+    public User updateUserProfile(String userId, String username, Long phoneNumber,
+                                  MultipartFile profilePicture,
+                                  String userEmail, String userType, String branch) throws IOException {
         User user = userRepository.findByUserId(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found with id " + userId));
 
-        // Handle profile picture upload
         String profilePictureFilename = handleProfilePictureUpload(profilePicture);
 
-        // Update user details
         if (username != null && !username.isEmpty()) {
             user.setUsername(username);
         }
@@ -229,9 +264,6 @@ public class UserService implements UserDetailsService {
         if (branch != null && !branch.isEmpty()) {
             user.setBranch(branch);
         }
-
-
-
         return userRepository.save(user);
     }
 
@@ -261,14 +293,16 @@ public class UserService implements UserDetailsService {
     }
 
 
+    //Verify Current Password
     public boolean verifyCurrentPassword(String userId, String currentPassword) throws ResourceNotFoundException {
         User user = userRepository.findByUserId(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + userId));
 
-        // Check if the provided current password matches the hashed password in the database
+
         return passwordEncoder.matches(currentPassword, user.getPassword());
     }
 
+    //update Password
     public void updatePassword(String userId, String newPassword) throws ResourceNotFoundException {
         User user = userRepository.findByUserId(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + userId));
@@ -277,9 +311,5 @@ public class UserService implements UserDetailsService {
         user.setPassword(passwordEncoder.encode(newPassword));
         userRepository.save(user);
     }
-
-
-
-
 
 }

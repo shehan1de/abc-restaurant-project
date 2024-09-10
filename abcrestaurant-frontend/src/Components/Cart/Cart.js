@@ -12,7 +12,7 @@ const Cart = () => {
   const [cartItems, setCartItems] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [productToRemove, setProductToRemove] = useState(null);
-  const navigate = useNavigate();  // Initialize useNavigate
+  const navigate = useNavigate();
 
   useEffect(() => {
     const token = localStorage.getItem('token');

@@ -38,7 +38,7 @@ public class ReportController {
 
             return new ResponseEntity<>(pdfBytes, headers, HttpStatus.OK);
         } catch (IOException | DocumentException e) {
-            e.printStackTrace(); // Optionally log the error message
+            e.printStackTrace();
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }

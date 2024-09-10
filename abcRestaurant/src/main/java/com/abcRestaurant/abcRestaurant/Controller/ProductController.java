@@ -46,13 +46,10 @@ public class ProductController {
             @RequestParam("productImage") MultipartFile productImage) {
 
         try {
-            // Generate a unique filename for the image
             String filename = generateUniqueFilename(productImage.getOriginalFilename());
 
-            // Save the file
             fileStorageService.saveFile(productImage.getBytes(), filename);
 
-            // Create Product object
             Product product = new Product();
             product.setProductName(productName);
             product.setCategoryName(categoryName);
@@ -60,7 +57,6 @@ public class ProductController {
             product.setProductDescription(productDescription);
             product.setProductImage(filename);
 
-            // Save the product
             Product newProduct = productService.addProduct(product);
             return new ResponseEntity<>(newProduct, HttpStatus.CREATED);
 
@@ -81,7 +77,8 @@ public class ProductController {
 
         Map<String, Object> response = new HashMap<>();
         try {
-            Product updatedProduct = productService.updateProduct(productId, productName, categoryName, productPrice, productDescription, productImage);
+            Product updatedProduct = productService.updateProduct(productId, productName, categoryName, productPrice,
+                    productDescription, productImage);
 
             response.put("status", "success");
             response.put("product", updatedProduct);
