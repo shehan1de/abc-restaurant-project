@@ -50,7 +50,7 @@ const Reservation = () => {
         } else if (!/^\d+$/.test(reservation.phoneNumber)) {
             errors.phoneNumber = "Phone number must be digits only";
         }
-        if (!reservation.branch)errors.branch="Branch is required";
+        if (!reservation.branch) errors.branch = "Branch is required";
         if (!reservation.date) errors.date = "Date is required";
         if (!reservation.time) errors.time = "Time is required";
         if (!reservation.persons) errors.persons = "Number of persons is required";
@@ -127,8 +127,7 @@ const Reservation = () => {
                         <div className="spinner-border text-primary" role="status">
                             <span className="visually-hidden">Loading...</span>
                         </div>
-                        <p className="mt-3" style={{ color: 'white',fontSize:20 }}>Sending your Reservation. Please wait...</p>
-
+                        <p className="mt-3" style={{ color: 'white', fontSize: 20 }}>Sending your Reservation. Please wait...</p>
                     </div>
                 ) : (
                     <form onSubmit={handleSubmit}>
@@ -180,29 +179,28 @@ const Reservation = () => {
                             </div>
                         </div>
 
-<div className="mb-3 row">
-    <label htmlFor="branch" className="col-sm-2 col-form-label">Nearest Branch *</label>
-    <div className="col-sm-10">
-        <div className="form-select-wrapper">
-            <select
-                className={`form-select ${errors.branch ? 'is-invalid' : ''}`}
-                id="branch"
-                name="branch"
-                value={reservation.branch}
-                onChange={handleChange}
-            >
-                <option value="" disabled>Select a branch</option>
-                {branches.map(branch => (
-                    <option key={branch.branchName} value={branch.branchName}>
-                        {branch.branchName}
-                    </option>
-                ))}
-            </select>
-        </div>
-        {errors.branch && <div className="invalid-feedback">{errors.branch}</div>}
-    </div>
-</div>
-
+                        <div className="mb-3 row">
+                            <label htmlFor="branch" className="col-sm-2 col-form-label">Nearest Branch *</label>
+                            <div className="col-sm-10">
+                                <div className="form-select-wrapper">
+                                    <select
+                                        className={`form-select ${errors.branch ? 'is-invalid' : ''}`}
+                                        id="branch"
+                                        name="branch"
+                                        value={reservation.branch}
+                                        onChange={handleChange}
+                                    >
+                                        <option value="" disabled>Select a branch</option>
+                                        {branches.map(branch => (
+                                            <option key={branch.branchName} value={branch.branchName}>
+                                                {branch.branchName}
+                                            </option>
+                                        ))}
+                                    </select>
+                                </div>
+                                {errors.branch && <div className="invalid-feedback">{errors.branch}</div>}
+                            </div>
+                        </div>
 
                         <div className="mb-3 row">
                             <label htmlFor="date" className="col-sm-2 col-form-label">Date *</label>
@@ -266,10 +264,21 @@ const Reservation = () => {
                             </div>
                         </div>
 
-                        {/* <button type="submit" className="btn btn-primary-submit" id="submitReservation">Submit Reservation</button> */}
-
                         <div className="d-flex justify-content-between align-items-center mb-3">
-                            <button type="submit" className="btn btn-primary-submit" id='submitReservation'>Submit Reservation</button>
+                            <button
+                                type="submit"
+                                className="btn btn-primary-submit"
+                                id="submitReservation"
+                                disabled={loading}
+                            >
+                                {loading ? (
+                                    <span>
+                                        <i className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></i> Submitting...
+                                    </span>
+                                ) : (
+                                    'Submit Reservation'
+                                )}
+                            </button>
                         </div>
                     </form>
                 )}

@@ -1,6 +1,7 @@
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import { toast } from 'react-toastify';
 import '../../CSS/Card.css';
 import Navigation2 from '../Navigations/navigation2';
 import SecFooter from '../footer2';
@@ -64,19 +65,35 @@ const ProductView = () => {
         });
     };
 
-    const handleAddToCart = (product) => {
-        if (cart[product.productId]?.quantity > 0) {
+    const handleAddToCart = async (product) => {
+        const currentQuantity = cart[product.productId]?.quantity || 0;
+
+        if (currentQuantity > 0) {
             const newCart = {
                 ...cart,
                 [product.productId]: {
                     ...product,
-                    quantity: (cart[product.productId]?.quantity || 0) + 1
+                    quantity: currentQuantity + 1
                 }
             };
             setCart(newCart);
             localStorage.setItem('cart', JSON.stringify(newCart));
+
+            try {
+                await axios.post('/api/cart/add', null, {
+                    params: {
+                        userId,
+                        productId: product.productId,
+                        quantity: newCart[product.productId].quantity
+                    }
+                });
+                toast.success('Cart Updated Successfully!');
+            } catch (error) {
+                console.error('Error adding product to cart:', error);
+                toast.error('Error adding product to cart.');
+            }
         } else {
-            console.log('Quantity must be greater than 0');
+            toast.warn('Quantity must be at least 1');
         }
     };
 
@@ -175,7 +192,7 @@ const ProductView = () => {
                     ))}
                 </div>
             )}
-            <SecFooter/>
+            <SecFooter />
         </>
     );
 };

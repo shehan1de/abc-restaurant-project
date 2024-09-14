@@ -204,7 +204,7 @@ const Index = () => {
                             </div>
                         </div>
 
-                        <button type="submit" className="btn btn-primary-submit">Submit your Feedback</button>
+                        <button type="submit" className="btn btn-primary-submit" id='submitFeedback'>Submit your Feedback</button>
                     </form>
                 )}
             </div>

@@ -202,7 +202,7 @@ const Register = () => {
                         </div>
 
                         <div className="d-flex justify-content-between align-items-center mb-3">
-                            <button type="submit" className="btn btn-primary-submit">CREATE ACCOUNT</button>
+                            <button type="submit" className="btn btn-primary-submit" id='register' disabled={loading}>CREATE ACCOUNT</button>
                         </div>
 
                         <p className="mt-3 text-center">

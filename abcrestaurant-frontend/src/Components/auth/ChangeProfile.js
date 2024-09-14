@@ -224,7 +224,7 @@ const ChangeProfile = () => {
               </div>
             </div>
           </div>
-          <button type="submit" className="btn btn-primary-submit">Update Profile</button>
+          <button type="submit" className="btn btn-primary-submit" id='updateProfile'>Update Profile</button>
         </form>
       </div>
       <SecFooter/>
